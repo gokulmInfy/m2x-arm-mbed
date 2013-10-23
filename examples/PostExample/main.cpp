@@ -9,7 +9,7 @@ char streamName[] = "<stream name>"; // Stream you want to post to
 char m2xKey[] = "<m2x key>"; // Your M2X access key
 
 Client client;
-M2XStreamClient m2xClient(&client, m2xKey, "192.168.1.4", 9393);
+M2XStreamClient m2xClient(&client, m2xKey);
 
 EthernetInterface eth;
 
