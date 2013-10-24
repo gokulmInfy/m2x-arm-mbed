@@ -1,7 +1,7 @@
-m2x-arm-mbed
-============
+ARM mbed M2X API Client
+========================
 
-Client library used to send/receive data to/from [AT&amp;T's M2X service](https://m2x.att.com/) from [mbed LPC1768](http://mbed.org/platforms/mbed-LPC1768/) microcontrollers.
+The ARM mbed client library is used to send/receive data to/from [AT&amp;T's M2X service](https://m2x.att.com/) from [mbed LPC1768](http://mbed.org/platforms/mbed-LPC1768/) microcontrollers.
 
 Getting Started
 ==========================
