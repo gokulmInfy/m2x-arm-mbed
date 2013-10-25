@@ -219,3 +219,8 @@ ReadLocationExample
 -------------------
 
 This one reads location data of a feed from M2X server, and prints them to Serial interfact. You can check the output in the Serial output.
+
+License
+=======
+
+This library is released under the MIT license. See [`M2XStreamClient/LICENSE`](M2XStreamClient/LICENSE) for the terms.
