@@ -2,6 +2,7 @@
 #include "M2XStreamClient.h"
 
 #include "mbed.h"
+#include "LM75B.h"
 #include "EthernetInterface.h"
 
 char feedId[] = "<feed id>"; // Feed you want to post to
@@ -12,11 +13,7 @@ Client client;
 M2XStreamClient m2xClient(&client, m2xKey);
 
 EthernetInterface eth;
-
-void on_data_point_found(const char* at, const char* value, int index, void* context) {
-  printf("Found a data point, index: %d\n", index);
-  printf("At: %s\n Value: %s\n", at, value);
-}
+LM75B tmp(p28,p27);
 
 int main() {
   eth.init();
@@ -24,7 +21,10 @@ int main() {
   printf("IP Address: %s\n", eth.getIPAddress());
 
   while (true) {
-    int response = m2xClient.receive(feedId, streamName, on_data_point_found, NULL);
+    double val = tmp.read();
+    printf("Current temperature is: %lf", val);
+
+    int response = m2xClient.send(feedId, streamName, val);
     printf("Post response code: %d\n", response);
 
     if (response == -1) while (true) ;
