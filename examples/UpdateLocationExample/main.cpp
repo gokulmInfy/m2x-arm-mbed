@@ -5,7 +5,7 @@
 #include "EthernetInterface.h"
 
 char feedId[] = "<feed id>"; // Feed you want to post to
-char m2xKey[] = "<m2x key>"; // Your M2X access key
+char m2xKey[] = "<m2x api key>"; // Your M2X API Key or Master API Key
 
 char name[] = "<location name>"; // Name of current location of datasource
 double latitude = -37.97884;
