@@ -96,7 +96,7 @@ private:
   void writeSendHeader(const char* feedId,
                        const char* streamName,
                        int contentLength);
-  // Writes HTTP header lines including M2X key, host, content
+  // Writes HTTP header lines including M2X API Key, host, content
   // type and content length(if the body exists)
   void writeHttpHeader(int contentLength);
   // Parses HTTP response header and return the content length.
