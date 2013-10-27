@@ -40,7 +40,7 @@ To run the examples, please follow the steps below:
     http://mbed.org/users/citrusbyte/code/M2XStreamClient/
     ```
 
-8. Create a file named `main.cpp`, and paste in any of the examples. Modify the M2X key, feed ID or stream name as needed by the examples.
+8. Create a file named `main.cpp`, and paste in any of the examples. Modify the M2X API Key, feed ID or stream name as needed by the examples.
 9. When you are done, click `Compile`. if no error is found, a bin file will be downloaded to your computer.
 10. Copy that bin file to your mbed microcontroller, press the `reset` button, then you should be able to run the program!
 
