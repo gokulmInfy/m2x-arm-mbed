@@ -23,7 +23,7 @@ To run the examples, please follow the steps below:
 1. Launch [mbed online compiler](https://mbed.org/compiler/) in your browser
 2. Click `New` to create a new program, select `Empty Program` as the template and give it a name, then click `OK`.
 3. Right click on the project you just created, select `Import Library…->From Import Wizard…`, select `Libraries` tab, use the scrollbar or the search box at the right to find `mbed` library, double click it to import it.
-4. Use the same step as #3 to import `mbed-rtos` and `EthernetInterface` libraries.
+4. Use the same step as #3 to import `mbed-rtos` and `EthernetInterface` (mbed official) libraries.
 
     **NOTE**: To Run the `PostExample` example, you also need to import `LM75B` library in the same way to use the temperature sensor.
 
