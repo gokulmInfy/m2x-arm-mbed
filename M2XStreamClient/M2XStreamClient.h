@@ -3,10 +3,17 @@
 
 #define MIN(a, b) (((a) > (b))?(b):(a))
 
-#include "mbed.h"
-#include "Client.h"
-#include "Utility.h"
+#define MBED_PLATFORM
 
+#ifdef ARDUINO_PLATFORM
+#include "Arduino.h"
+#endif
+
+#ifdef MBED_PLATFORM
+#include "mbed.h"
+#endif
+
+#include "Client.h"
 #include "NullPrint.h"
 
 static const int E_OK = 0;
@@ -124,4 +131,3 @@ private:
 };
 
 #endif  /* M2XStreamClient_h */
-

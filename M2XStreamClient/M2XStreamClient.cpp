@@ -5,6 +5,24 @@
 #include "StreamParseFunctions.h"
 #include "LocationParseFunctions.h"
 
+#ifdef DEBUG
+#ifdef ARDUINO_PLATFORM
+#define DBG(fmt_, data_) Serial.print(data_)
+#define DBGLN(fmt_, data_) Serial.println(data_)
+#define DBGLNEND Serial.println()
+#endif  // ARDUINO_PLATFORM
+
+#ifdef MBED_PLATFORM
+#define DBG(fmt_, data_) printf((fmt_), (data_))
+#define DBGLN(fmt_, data_) printf((fmt_), (data_)); printf("\n")
+#define DBGLNEND printf("\n")
+#endif  // MBED_PLATFORM
+#else
+#define DBG(fmt_, data_)
+#define DBGLN(fmt_, data_)
+#define DBGLNEND
+#endif  // DEBUG
+
 #define HEX(t_) ((char) (((t_) > 9) ? ((t_) - 10 + 'A') : ((t_) + '0')))
 #define MAX_DOUBLE_DIGITS 7
 
@@ -27,9 +45,7 @@ int M2XStreamClient::send(const char* feedId,
                           const char* streamName,
                           double value) {
   if (_client->connect(_host, _port)) {
-#ifdef DEBUG
-    printf("Connected to M2X server!\n");
-#endif
+    DBGLN("%s", "Connected to M2X server!");
     writeSendHeader(feedId, streamName,
                     // 6 for "value="
                     _null_print.print(value) + 6);
@@ -37,9 +53,7 @@ int M2XStreamClient::send(const char* feedId,
     // value is a double, does not need encoding
     _client->print(value);
   } else {
-#ifdef DEBUG
-    printf("ERROR: Cannot connect to M2X server!\n");
-#endif
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
     return E_NOCONNECTION;
   }
 
@@ -50,9 +64,7 @@ int M2XStreamClient::send(const char* feedId,
                           const char* streamName,
                           long value) {
   if (_client->connect(_host, _port)) {
-#ifdef DEBUG
-    printf("Connected to M2X server!\n");
-#endif
+    DBGLN("%s", "Connected to M2X server!");
     writeSendHeader(feedId, streamName,
                     // 6 for "value="
                     _null_print.print(value) + 6);
@@ -61,9 +73,7 @@ int M2XStreamClient::send(const char* feedId,
     // value is a long, does not need encoding
     _client->print(value);
   } else {
-#ifdef DEBUG
-    printf("ERROR: Cannot connect to M2X server!\n");
-#endif
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
     return E_NOCONNECTION;
   }
 
@@ -74,9 +84,7 @@ int M2XStreamClient::send(const char* feedId,
                           const char* streamName,
                           int value) {
   if (_client->connect(_host, _port)) {
-#ifdef DEBUG
-    printf("Connected to M2X server!\n");
-#endif
+    DBGLN("%s", "Connected to M2X server!");
     writeSendHeader(feedId, streamName,
                     // 6 for "value="
                     _null_print.print(value) + 6);
@@ -85,9 +93,7 @@ int M2XStreamClient::send(const char* feedId,
     // value is an int, does not need encoding
     _client->print(value);
   } else {
-#ifdef DEBUG
-    printf("ERROR: Cannot connect to M2X server!\n");
-#endif
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
     return E_NOCONNECTION;
   }
 
@@ -98,9 +104,7 @@ int M2XStreamClient::send(const char* feedId,
                           const char* streamName,
                           const char* value) {
   if (_client->connect(_host, _port)) {
-#ifdef DEBUG
-    printf("Connected to M2X server!\n");
-#endif
+    DBGLN("%s", "Connected to M2X server!");
     writeSendHeader(feedId, streamName,
                     // 6 for "value="
                     _null_print.print(value) + 6);
@@ -108,9 +112,7 @@ int M2XStreamClient::send(const char* feedId,
     _client->print("value=");
     print_encoded_string(_client, value);
   } else {
-#ifdef DEBUG
-    printf("ERROR: Cannot connect to M2X server!\n");
-#endif
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
     return E_NOCONNECTION;
   }
 
@@ -120,9 +122,7 @@ int M2XStreamClient::send(const char* feedId,
 int M2XStreamClient::receive(const char* feedId, const char* streamName,
                              stream_value_read_callback callback, void* context) {
   if (_client->connect(_host, _port)) {
-#ifdef DEBUG
-    printf("Connected to M2X server!\n");
-#endif
+    DBGLN("%s", "Connected to M2X server!");
     _client->print("GET /v1/feeds/");
     print_encoded_string(_client, feedId);
     _client->print("/streams/");
@@ -131,9 +131,7 @@ int M2XStreamClient::receive(const char* feedId, const char* streamName,
 
     writeHttpHeader(-1);
   } else {
-#ifdef DEBUG
-    printf("ERROR: Cannot connect to M2X server!\n");
-#endif
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
     return E_NOCONNECTION;
   }
   int status = readStatusCode(false);
@@ -149,18 +147,14 @@ int M2XStreamClient::readLocation(const char* feedId,
                                   location_read_callback callback,
                                   void* context) {
   if (_client->connect(_host, _port)) {
-#ifdef DEBUG
-    printf("Connected to M2X server!\n");
-#endif
+    DBGLN("%s", "Connected to M2X server!");
     _client->print("GET /v1/feeds/");
     print_encoded_string(_client, feedId);
     _client->println("/location HTTP/1.0");
 
     writeHttpHeader(-1);
   } else {
-#ifdef DEBUG
-    printf("ERROR: Cannot connect to M2X server!\n");
-#endif
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
     return E_NOCONNECTION;
   }
   int status = readStatusCode(false);
@@ -229,9 +223,7 @@ int M2XStreamClient::updateLocation(const char* feedId,
                                     double longitude,
                                     double elevation) {
   if (_client->connect(_host, _port)) {
-#ifdef DEBUG
-    printf("Connected to M2X server!\n");
-#endif
+    DBGLN("%s", "Connected to M2X server!");
 
     int length = write_location_data(&_null_print, name, latitude, longitude,
                                      elevation);
@@ -242,9 +234,7 @@ int M2XStreamClient::updateLocation(const char* feedId,
     writeHttpHeader(length);
     write_location_data(_client, name, latitude, longitude, elevation);
   } else {
-#ifdef DEBUG
-    printf("ERROR: Cannot connect to M2X server!\n");
-#endif
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
     return E_NOCONNECTION;
   }
   return readStatusCode(true);
@@ -256,9 +246,7 @@ int M2XStreamClient::updateLocation(const char* feedId,
                                     const char* longitude,
                                     const char* elevation) {
   if (_client->connect(_host, _port)) {
-#ifdef DEBUG
-    printf("Connected to M2X server!\n");
-#endif
+    DBGLN("%s", "Connected to M2X server!");
 
     int length = write_location_data(&_null_print, name, latitude, longitude,
                                      elevation);
@@ -269,9 +257,7 @@ int M2XStreamClient::updateLocation(const char* feedId,
     writeHttpHeader(length);
     write_location_data(_client, name, latitude, longitude, elevation);
   } else {
-#ifdef DEBUG
-    printf("ERROR: Cannot connect to M2X server!\n");
-#endif
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
     return E_NOCONNECTION;
   }
   return readStatusCode(true);
@@ -285,7 +271,7 @@ void M2XStreamClient::writeSendHeader(const char* feedId,
   _client->print("/streams/");
   print_encoded_string(_client, streamName);
   _client->println(" HTTP/1.0");
-  
+
   writeHttpHeader(contentLength);
 }
 
@@ -293,7 +279,7 @@ void M2XStreamClient::writeHttpHeader(int contentLength) {
   _client->println(kUserAgentLine);
   _client->print("X-M2X-KEY: ");
   _client->println(_key);
-  
+
   _client->print("Host: ");
   print_encoded_string(_client, _host);
   if (_port != kDefaultM2XPort) {
@@ -305,9 +291,9 @@ void M2XStreamClient::writeHttpHeader(int contentLength) {
 
   if (contentLength > 0) {
     _client->println("Content-Type: application/x-www-form-urlencoded");
-#ifdef DEBUG
-    printf("Content Length: %d\n", contentLength);
-#endif
+    DBG("%s", "Content Length: ");
+    DBGLN("%d", contentLength);
+
     _client->print("Content-Length: ");
     _client->println(contentLength);
   }
@@ -321,9 +307,7 @@ int M2XStreamClient::waitForString(const char* str) {
   while (true) {
     while (_client->available()) {
       char c = _client->read();
-#ifdef DEBUG
-      printf("%c", c);
-#endif
+      DBG("%c", c);
 
       if ((str[currentIndex] == '*') ||
           (c == str[currentIndex])) {
@@ -338,9 +322,8 @@ int M2XStreamClient::waitForString(const char* str) {
     }
 
     if (!_client->connected()) {
-#ifdef DEBUG
-      printf("ERROR: The client is disconnected from the server!\n");
-#endif
+      DBGLN("%s", "ERROR: The client is disconnected from the server!");
+
       close();
       return E_DISCONNECTED;
     }
@@ -365,9 +348,8 @@ int M2XStreamClient::readStatusCode(bool closeClient) {
   while (true) {
     while (_client->available()) {
       char c = _client->read();
-#ifdef DEBUG
-      printf("%c", c);
-#endif
+      DBG("%c", c);
+
       responseCode = responseCode * 10 + (c - '0');
       ret++;
       if (ret == 3) {
@@ -377,9 +359,8 @@ int M2XStreamClient::readStatusCode(bool closeClient) {
     }
 
     if (!_client->connected()) {
-#ifdef DEBUG
-      printf("ERROR: The client is disconnected from the server!\n");
-#endif
+      DBGLN("%s", "ERROR: The client is disconnected from the server!");
+
       if (closeClient) close();
       return E_DISCONNECTED;
     }
@@ -403,9 +384,8 @@ int M2XStreamClient::readContentLength() {
   while (true) {
     while (_client->available()) {
       char c = _client->read();
-#ifdef DEBUG
-      printf("%c", c);
-#endif
+      DBG("%c", c);
+
       if ((c == '\r') || (c == '\n')) {
         return (ret == 0) ? (E_INVALID) : (ret);
       } else {
@@ -414,9 +394,8 @@ int M2XStreamClient::readContentLength() {
     }
 
     if (!_client->connected()) {
-#ifdef DEBUG
-      printf("ERROR: The client is disconnected from the server!\n");
-#endif
+      DBGLN("%s", "ERROR: The client is disconnected from the server!");
+
       return E_DISCONNECTED;
     }
 
@@ -472,18 +451,12 @@ int M2XStreamClient::readStreamValue(stream_value_read_callback callback,
   while (index < length) {
     int i = 0;
 
-#ifdef DEBUG
-    printf("Received Data: ");
-#endif
+    DBG("%s", "Received Data: ");
     while ((i < BUF_LEN) && _client->available()) {
       buf[i++] = _client->read();
-#ifdef DEBUG
-      printf("%c", buf[i - 1]);
-#endif
+      DBG("%c", buf[i - 1]);
     }
-#ifdef DEBUG
-      printf("\n");
-#endif
+    DBGLNEND;
 
     if ((!_client->connected()) &&
         (!_client->available()) &&
@@ -544,18 +517,12 @@ int M2XStreamClient::readLocation(location_read_callback callback,
   while (index < length) {
     int i = 0;
 
-#ifdef DEBUG
-    printf("Received Data: ");
-#endif
+    DBG("%s", "Received Data: ");
     while ((i < BUF_LEN) && _client->available()) {
       buf[i++] = _client->read();
-#ifdef DEBUG
-      printf("%c", buf[i - 1]);
-#endif
+      DBG("%c", buf[i - 1]);
     }
-#ifdef DEBUG
-    printf("\n");
-#endif
+    DBGLNEND;
 
     if ((!_client->connected()) &&
         (!_client->available()) &&
@@ -580,4 +547,3 @@ int M2XStreamClient::readLocation(location_read_callback callback,
   close();
   return (result == jsonlite_result_ok) ? (E_OK) : (E_JSON_INVALID);
 }
-

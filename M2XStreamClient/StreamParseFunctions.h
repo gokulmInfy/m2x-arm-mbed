@@ -66,4 +66,3 @@ static void on_stream_string_found(jsonlite_callback_context* context,
 }
 
 #endif  /* StreamParseFunctions_h */
-

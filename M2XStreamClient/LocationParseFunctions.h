@@ -98,4 +98,3 @@ static void on_location_string_found(jsonlite_callback_context* context,
 }
 
 #endif  /* LocationParseFunctions_h */
-

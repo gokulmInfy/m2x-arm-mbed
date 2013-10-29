@@ -1,8 +1,10 @@
 #ifndef Client_h
 #define Client_h
 
-#include "Print.h"
 #include "TCPSocketConnection.h"
+
+#include "Print.h"
+#include "Utility.h"
 
 /*
  * TCP Client
