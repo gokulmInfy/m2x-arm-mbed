@@ -16,6 +16,27 @@
 #include "Client.h"
 #include "NullPrint.h"
 
+#ifdef DEBUG
+#ifdef ARDUINO_PLATFORM
+#define DBG(fmt_, data_) Serial.print(data_)
+#define DBGLN(fmt_, data_) Serial.println(data_)
+#define DBGLNEND Serial.println()
+#endif  // ARDUINO_PLATFORM
+
+#ifdef MBED_PLATFORM
+#define DBG(fmt_, data_) printf((fmt_), (data_))
+#define DBGLN(fmt_, data_) printf((fmt_), (data_)); printf("\n")
+#define DBGLNEND printf("\n")
+#endif  // MBED_PLATFORM
+#else
+#define DBG(fmt_, data_)
+#define DBGLN(fmt_, data_)
+#define DBGLNEND
+#endif  // DEBUG
+
+#define HEX(t_) ((char) (((t_) > 9) ? ((t_) - 10 + 'A') : ((t_) + '0')))
+#define MAX_DOUBLE_DIGITS 7
+
 static const int E_OK = 0;
 static const int E_NOCONNECTION = -1;
 static const int E_DISCONNECTED = -2;
@@ -46,13 +67,35 @@ public:
                   const char* host = kDefaultM2XHost,
                   int port = kDefaultM2XPort);
 
-  // Update data stream, returns the HTTP status code
-  int send(const char* feedId, const char* streamName, double value);
-  int send(const char* feedId, const char* streamName, long value);
-  int send(const char* feedId, const char* streamName, int value);
-  int send(const char* feedId, const char* streamName, const char* value);
+  // Post data stream value, returns the HTTP status code
+  template <class T>
+  int post(const char* feedId, const char* streamName, T value);
 
-  // Receive values for a particular data stream. Since memory is
+  // Post multiple values to M2X all at once.
+  // +feedId+ - id of the feed to post values
+  // +streamNum+ - Number of streams to post
+  // +names+ - Array of stream names, the length of the array should
+  // be exactly +streamNum+
+  // +counts+ - Array of +streamNum+ length, each item in this array
+  // containing the number of values we want to post for each stream
+  // +ats+ - Timestamps for each value, the length of this array should
+  // be the some of all values in +counts+, for the first +counts[0]+
+  // items, the values belong to the first stream, for the following
+  // +counts[1]+ number of items, the values belong to the second stream,
+  // etc. Note timestamps are optional, if a value does not havee timestamp,
+  // we can simply put NULL here, or we can put NULl for +ats+, meaning
+  // none of the values has a timestamp
+  // +values+ - Values to post. This works the same way as +ats+, the
+  // first +counts[0]+ number of items contain values to post to the first
+  // stream, the succeeding +counts[1]+ number of items contain values
+  // for the second stream, etc. The length of this array should be
+  // the sum of all values in +counts+ array.
+  template <class T>
+  int postMultiple(const char* feedId, int streamNum,
+                   const char* names[], const int counts[],
+                   const char* ats[], T values[]);
+
+  // Fetch values for a particular data stream. Since memory is
   // very limited on an Arduino, we cannot parse and get all the
   // data points in memory. Instead, we use callbacks here: whenever
   // a new data point is parsed, we call the callback using the values,
@@ -64,8 +107,10 @@ public:
   // For each data point, the callback will be called once. The HTTP
   // status code will be returned. And the content is only parsed when
   // the status code is 200.
-  int receive(const char* feedId, const char* streamName,
-              stream_value_read_callback callback, void* context);
+  int fetchValues(const char* feedId, const char* streamName,
+                  stream_value_read_callback callback, void* context,
+                  const char* startTime = NULL, const char* endTime = NULL,
+                  const char* limit = NULL);
 
   // Update datasource location
   // NOTE: On an Arduino Uno and other ATMEGA based boards, double has
@@ -81,11 +126,9 @@ public:
   // precision, which means you are free to use the double-version only
   // without any precision problems.
   // Returned value is the http status code.
+  template <class T>
   int updateLocation(const char* feedId, const char* name,
-                     double latitude, double longitude, double elevation);
-  int updateLocation(const char* feedId, const char* name,
-                     const char* latitude, const char* longitude,
-                     const char* elevation);
+                     T latitude, T longitude, T elevation);
 
   // Read location information for a feed. Also used callback to process
   // data points for memory reasons. The HTTP status code is returned,
@@ -100,7 +143,7 @@ private:
   NullPrint _null_print;
 
   // Writes the HTTP header part for updating a stream value
-  void writeSendHeader(const char* feedId,
+  void writePostHeader(const char* feedId,
                        const char* streamName,
                        int contentLength);
   // Writes HTTP header lines including M2X API Key, host, content
@@ -129,5 +172,7 @@ private:
   // we get a data point
   int readLocation(location_read_callback callback, void* context);
 };
+
+#include "M2XStreamClient_template.h"
 
 #endif  /* M2XStreamClient_h */
