@@ -24,7 +24,7 @@ int main() {
   printf("IP Address: %s\n", eth.getIPAddress());
 
   while (true) {
-    int response = m2xClient.receive(feedId, streamName, on_data_point_found, NULL);
+    int response = m2xClient.fetchValues(feedId, streamName, on_data_point_found, NULL);
     printf("Post response code: %d\n", response);
 
     if (response == -1) while (true) ;
