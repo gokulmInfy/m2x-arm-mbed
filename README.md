@@ -105,24 +105,36 @@ static const int E_INVALID = -4;
 static const int E_JSON_INVALID = -5;
 ```
 
-Send stream value
+Post stream value
 -----------------
 
-The following functions can be used to send value to a stream, which belongs to a feed:
+The following functions can be used to post value to a stream, which belongs to a feed:
 
 ```
-int send(const char* feedId, const char* streamName, double value);
-int send(const char* feedId, const char* streamName, long value);
-int send(const char* feedId, const char* streamName, int value);
-int send(const char* feedId, const char* streamName, const char* value);
+template <class T>
+int post(const char* feedId, const char* streamName, T value);
 ```
 
-Each one here requires a feed ID and a stream name, different types of value can be used here. Feel free to use any of them to send stream values to M2X server.
+Here we use C++ templates to generate functions for different types of values, feel free to use values of `float`, `int`, `long` or even `const char*` types here.
 
-Receive stream value
+Post multiple values
 --------------------
 
-Since mbed microcontroller contains very limited API, we cannot put the whole returned string in memory, parse it into JSON representations and read what we want. Instead, we use a callback-based mechanism here. We parse the returned JSON string piece by piece, whenever we got a new stream value point, we will call the following callback functions:
+M2X also supports posting multiple values to multiple streams in one call, use the following function for this:
+
+```
+template <class T>
+int postMultiple(const char* feedId, int streamNum,
+                 const char* names[], const int counts[],
+                 const char* ats[], T values[]);
+```
+
+Please refer to the comments in the source code on how to use this function, basically, you need to provide the list of streams you want to post to, and values for each stream.
+
+Fetch stream value
+------------------
+
+Since mbed microcontroller contains very limited memory, we cannot put the whole returned string in memory, parse it into JSON representations and read what we want. Instead, we use a callback-based mechanism here. We parse the returned JSON string piece by piece, whenever we got a new stream value point, we will call the following callback functions:
 
 ```
 void (*stream_value_read_callback)(const char* at,
@@ -137,28 +149,26 @@ The implementation of the callback function is left for the user to fill in, you
 To read the stream values, all you need to do is calling this function:
 
 ```
-int receive(const char* feedId, const char* streamName,
-            stream_value_read_callback callback, void* context);
+int fetchValues(const char* feedId, const char* streamName,
+                stream_value_read_callback callback, void* context,
+                const char* startTime = NULL, const char* endTime = NULL,
+                const char* limit = NULL);
 ```
 
-Besides the feed ID and stream name, only the callback function and a user context needs to be specified.
+Besides the feed ID and stream name, only the callback function and a user context needs to be specified. Optional filtering parameters such as start time, end time and limits per call can also be used here.
 
 Update Datasource Location
 --------------------------
 
-You can use either of the following functions to update the location for a data source(feed):
+You can use the following function to update the location for a data source(feed):
 
 ```
+template <class T>
 int updateLocation(const char* feedId, const char* name,
-                   double latitude, double longitude, double elevation);
-int updateLocation(const char* feedId, const char* name,
-                   const char* latitude, const char* longitude,
-                   const char* elevation);
+                   T latitude, T longitude, T elevation);
 ```
 
-Different from stream values, locations are attached to feeds rather than streams.
-
-We provide 2 types of functions here, since the GPS cordinates can come in different formats. What's more, we are trying to maintain a common API set with the Arduino M2X library, which has the same functions as here.
+Different from stream values, locations are attached to feeds rather than streams. We use templates here, since the values may be in different format, for example, you can express latitudes in both `double` and `const char*`.
 
 Read Datasource Location
 ------------------------
@@ -186,6 +196,7 @@ int readLocation(const char* feedId, location_read_callback callback,
 
 ```
 
+
 How to read Serial output
 =========================
 
@@ -198,25 +209,30 @@ We provide a series of examples that will help you get an idea of how to use the
 
 Note that the examples contain fictionary variables, and that they need to be configured as per the instructions above before running on your mbed microcontroller. Each of the examples here also needs an Internet connection setup, either via an Ethernet port or a Wifi module.
 
-In the `PostExample`, the temperature sensor on the mbed application board is needed. For other examples, no extra modules are needed besides the network connection.
+In the `Post` example, the temperature sensor on the mbed application board is needed. For other examples, no extra modules are needed besides the network connection.
 
-PostExample
------------
+Post
+----
 
 This example shows how to post temperatures to M2X server. Before running this, you need to have a valid M2X Key, a feed ID and a stream name. The mbed microcontroller need to be hooked on the mbed application board in order to use the temperature sensor.
 
-ReceiveExample
---------------
+PostMultiple
+------------
+
+This example shows how to post multiple values to multiple streams in one API call.
+
+FetchValues
+-----------
 
 This example reads stream values from M2X server. And prints the stream data point got to Serial interface. You can find the actual values in the Serial output.
 
-UpdateLocationExample
----------------------
+UpdateLocation
+--------------
 
 This one sends location data to M2X server. Idealy a GPS device should be used here to read the cordinates, but for simplicity, we just use pre-set values here to show how to use the API.
 
-ReadLocationExample
--------------------
+ReadLocation
+------------
 
 This one reads location data of a feed from M2X server, and prints them to Serial interfact. You can check the output in the Serial output.
 
