@@ -7,10 +7,14 @@
 
 #ifdef ARDUINO_PLATFORM
 #include "Arduino.h"
+
+#define USER_AGENT "User-Agent: M2X Arduino Client/0.1"
 #endif
 
 #ifdef MBED_PLATFORM
 #include "mbed.h"
+
+#define USER_AGENT "User-Agent: M2X Mbed Client/0.1"
 #endif
 
 #include "Client.h"
@@ -64,6 +68,7 @@ public:
 
   M2XStreamClient(Client* client,
                   const char* key,
+                  int case_insensitive = 1,
                   const char* host = kDefaultM2XHost,
                   int port = kDefaultM2XPort);
 
@@ -138,6 +143,7 @@ public:
 private:
   Client* _client;
   const char* _key;
+  int _case_insensitive;
   const char* _host;
   int _port;
   NullPrint _null_print;
