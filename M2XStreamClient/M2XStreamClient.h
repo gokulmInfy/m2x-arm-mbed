@@ -87,9 +87,8 @@ public:
   // be the some of all values in +counts+, for the first +counts[0]+
   // items, the values belong to the first stream, for the following
   // +counts[1]+ number of items, the values belong to the second stream,
-  // etc. Note timestamps are optional, if a value does not havee timestamp,
-  // we can simply put NULL here, or we can put NULl for +ats+, meaning
-  // none of the values has a timestamp
+  // etc. Notice that timestamps are required here: you must provide
+  // a timestamp for each value posted.
   // +values+ - Values to post. This works the same way as +ats+, the
   // first +counts[0]+ number of items contain values to post to the first
   // stream, the succeeding +counts[1]+ number of items contain values

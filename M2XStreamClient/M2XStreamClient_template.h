@@ -34,13 +34,9 @@ inline int write_multiple_values(Print* print, int streamNum,
     bytes += print->print(names[i]);
     bytes += print->print("\":[");
     for (int j = 0; j < counts[i]; j++) {
-      bytes += print->print("{");
-      if (ats && ats[value_index]) {
-        bytes += print->print("\"at\": \"");
-        bytes += print->print(ats[value_index]);
-        bytes += print->print("\",");
-      }
-      bytes += print->print("\"value\": \"");
+      bytes += print->print("{\"at\": \"");
+      bytes += print->print(ats[value_index]);
+      bytes += print->print("\", \"value\": \"");
       bytes += print->print(values[value_index]);
       bytes += print->print("\"}");
       if (j < counts[i] - 1) { bytes += print->print(","); }
