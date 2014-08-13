@@ -37,7 +37,7 @@ To run the examples, please follow the steps below:
 7. Use the same step as #5 to import the following M2X client library:
 
     ```
-    http://mbed.org/users/citrusbyte/code/M2XStreamClient/
+    https://mbed.org/teams/ATT-M2X-team/code/M2XStreamClient/
     ```
 
 8. Create a file named `main.cpp`, and paste in any of the examples. Modify the M2X API Key, feed ID or stream name as needed by the examples.
