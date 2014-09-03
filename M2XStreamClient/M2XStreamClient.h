@@ -72,9 +72,9 @@ public:
                   const char* host = kDefaultM2XHost,
                   int port = kDefaultM2XPort);
 
-  // Post data stream value, returns the HTTP status code
+  // Push data stream value using PUT request, returns the HTTP status code
   template <class T>
-  int post(const char* feedId, const char* streamName, T value);
+  int put(const char* feedId, const char* streamName, T value);
 
   // Post multiple values to M2X all at once.
   // +feedId+ - id of the feed to post values
@@ -148,9 +148,9 @@ private:
   NullPrint _null_print;
 
   // Writes the HTTP header part for updating a stream value
-  void writePostHeader(const char* feedId,
-                       const char* streamName,
-                       int contentLength);
+  void writePutHeader(const char* feedId,
+                      const char* streamName,
+                      int contentLength);
   // Writes HTTP header lines including M2X API Key, host, content
   // type and content length(if the body exists)
   void writeHttpHeader(int contentLength);

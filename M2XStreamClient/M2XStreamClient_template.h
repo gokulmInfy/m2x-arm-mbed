@@ -6,12 +6,12 @@
 int print_encoded_string(Print* print, const char* str);
 
 template <class T>
-int M2XStreamClient::post(const char* feedId, const char* streamName, T value) {
+int M2XStreamClient::put(const char* feedId, const char* streamName, T value) {
   if (_client->connect(_host, _port)) {
     DBGLN("%s", "Connected to M2X server!");
-    writePostHeader(feedId, streamName,
-                    //  for {"value": and }
-                    _null_print.print(value) + 10);
+    writePutHeader(feedId, streamName,
+                   //  for {"value": and }
+                   _null_print.print(value) + 10);
     _client->print("{\"value\":");
     _client->print(value);
     _client->print("}");

@@ -4,7 +4,7 @@
 #include "mbed.h"
 #include "EthernetInterface.h"
 
-char feedId[] = "<feed id>"; // Feed you want to post to
+char feedId[] = "<feed id>"; // Feed you want to read location
 char m2xKey[] = "<m2x api key>"; // Your M2X API Key or Master API Key
 
 Client client;
@@ -31,7 +31,7 @@ int main() {
 
   while (true) {
     int response = m2xClient.readLocation(feedId, on_location_found, NULL);
-    printf("Post response code: %d\n", response);
+    printf("Read response code: %d\n", response);
 
     if (response == -1) while (true) ;
 

@@ -4,8 +4,8 @@
 #include "mbed.h"
 #include "EthernetInterface.h"
 
-char feedId[] = "<feed id>"; // Feed you want to post to
-char streamName[] = "<stream name>"; // Stream you want to post to
+char feedId[] = "<feed id>"; // Feed you want to receive values
+char streamName[] = "<stream name>"; // Stream you want to receive values
 char m2xKey[] = "<m2x api key>"; // Your M2X API Key or Master API Key
 
 Client client;
@@ -25,7 +25,7 @@ int main() {
 
   while (true) {
     int response = m2xClient.fetchValues(feedId, streamName, on_data_point_found, NULL);
-    printf("Post response code: %d\n", response);
+    printf("Fetch response code: %d\n", response);
 
     if (response == -1) while (true) ;
 

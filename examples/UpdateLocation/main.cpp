@@ -4,7 +4,7 @@
 #include "mbed.h"
 #include "EthernetInterface.h"
 
-char feedId[] = "<feed id>"; // Feed you want to post to
+char feedId[] = "<feed id>"; // Feed you want to update
 char m2xKey[] = "<m2x api key>"; // Your M2X API Key or Master API Key
 
 char name[] = "<location name>"; // Name of current location of datasource
@@ -24,7 +24,7 @@ int main() {
 
   while (true) {
     int response = m2xClient.updateLocation(feedId, name, latitude, longitude, elevation);
-    printf("Post response code: %d\n", response);
+    printf("Update response code: %d\n", response);
     elevation++;
 
     if (response == -1) while (true) ;

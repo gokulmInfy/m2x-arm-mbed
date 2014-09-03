@@ -126,9 +126,9 @@ int print_encoded_string(Print* print, const char* str) {
   return bytes;
 }
 
-void M2XStreamClient::writePostHeader(const char* feedId,
-                                      const char* streamName,
-                                      int contentLength) {
+void M2XStreamClient::writePutHeader(const char* feedId,
+                                     const char* streamName,
+                                     int contentLength) {
   _client->print("PUT /v1/feeds/");
   print_encoded_string(_client, feedId);
   _client->print("/streams/");

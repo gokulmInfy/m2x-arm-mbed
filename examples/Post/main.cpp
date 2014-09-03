@@ -5,8 +5,8 @@
 #include "LM75B.h"
 #include "EthernetInterface.h"
 
-char feedId[] = "<feed id>"; // Feed you want to post to
-char streamName[] = "<stream name>"; // Stream you want to post to
+char feedId[] = "<feed id>"; // Feed you want to push to
+char streamName[] = "<stream name>"; // Stream you want to push to
 char m2xKey[] = "<m2x api key>"; // Your M2X API Key or Master API Key
 
 Client client;
@@ -24,8 +24,8 @@ int main() {
     double val = tmp.read();
     printf("Current temperature is: %lf", val);
 
-    int response = m2xClient.post(feedId, streamName, val);
-    printf("Post response code: %d\n", response);
+    int response = m2xClient.put(feedId, streamName, val);
+    printf("Put response code: %d\n", response);
 
     if (response == -1) while (true) ;
 
