@@ -1,6 +1,8 @@
 ARM mbed M2X API Client
 ========================
 
+*NOTE*: We've [changed](https://github.com/attm2x/m2x-arm-mbed/commit/f604195ea13fa97c15faa5f1ae263658bec49686) one API function to avoid ambiguity. If you are using the older version of this library, there's a chance that you need to update your existing code to reflect the changed API.
+
 The ARM mbed client library is used to send/receive data to/from [AT&amp;T's M2X service](https://m2x.att.com/) from [mbed LPC1768](http://mbed.org/platforms/mbed-LPC1768/) microcontrollers.
 
 Getting Started
