@@ -3,7 +3,7 @@
 
 // Data structures and functions used to parse stream values
 
-#define STREAM_BUF_LEN 20
+#define STREAM_BUF_LEN 32
 
 typedef struct {
   uint8_t state;
