@@ -7,6 +7,7 @@
 
 const char* M2XStreamClient::kDefaultM2XHost = "api-m2x.att.com";
 
+static int write_delete_values(Print* print, const char* from, const char* end);
 int print_encoded_string(Print* print, const char* str);
 int tolower(int ch);
 
@@ -105,6 +106,32 @@ int M2XStreamClient::readLocation(const char* feedId,
   return status;
 }
 
+int M2XStreamClient::deleteValues(const char* feedId, const char* streamName,
+                                  const char* from, const char* end) {
+  if (_client->connect(_host, _port)) {
+    DBGLN("%s", "Connected to M2X server!");
+    int length = write_delete_values(&_null_print, from, end);
+    writeDeleteHeader(feedId, streamName, length);
+    write_delete_values(_client, from, end);
+  } else {
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
+    return E_NOCONNECTION;
+  }
+
+  return readStatusCode(true);
+}
+
+static int write_delete_values(Print* print, const char* from,
+                               const char* end) {
+  int bytes = 0;
+  bytes += print->print("{\"from\":\"");
+  bytes += print->print(from);
+  bytes += print->print("\",\"end\":\"");
+  bytes += print->print(end);
+  bytes += print->print("\"}");
+  return bytes;
+}
+
 // Encodes and prints string using Percent-encoding specified
 // in RFC 1738, Section 2.2
 int print_encoded_string(Print* print, const char* str) {
@@ -133,6 +160,19 @@ void M2XStreamClient::writePutHeader(const char* feedId,
   print_encoded_string(_client, feedId);
   _client->print("/streams/");
   print_encoded_string(_client, streamName);
+  _client->println(" HTTP/1.0");
+
+  writeHttpHeader(contentLength);
+}
+
+void M2XStreamClient::writeDeleteHeader(const char* feedId,
+                                        const char* streamName,
+                                        int contentLength) {
+  _client->print("DELETE /v1/feeds/");
+  print_encoded_string(_client, feedId);
+  _client->print("/streams/");
+  print_encoded_string(_client, streamName);
+  _client->print("/values");
   _client->println(" HTTP/1.0");
 
   writeHttpHeader(contentLength);

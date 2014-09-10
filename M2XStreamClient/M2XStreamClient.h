@@ -139,6 +139,23 @@ public:
   // response is only parsed when the HTTP status code is 200
   int readLocation(const char* feedId, location_read_callback callback,
                    void* context);
+
+  // Delete values from a data stream
+  // You will need to provide from and end date/time strings in the ISO8601
+  // format "yyyy-mm-ddTHH:MM:SS.SSSZ" where
+  //   yyyy: the year
+  //   mm: the month
+  //   dd: the day
+  //   HH: the hour (24 hour format)
+  //   MM: the minute
+  //   SS.SSS: the seconds (to the millisecond)
+  // NOTE: the time is given in Zulu (GMT)
+  // M2X will delete all values within the from to end date/time range.
+  // The status code is 204 on success and 400 on a bad request (e.g. the
+  // timestamp is not in ISO8601 format or the from timestamp is not less than
+  // or equal to the end timestamp.
+  int deleteValues(const char* feedId, const char* streamName,
+                   const char* from, const char* end);
 private:
   Client* _client;
   const char* _key;
@@ -151,6 +168,10 @@ private:
   void writePutHeader(const char* feedId,
                       const char* streamName,
                       int contentLength);
+  // Writes the HTTP header part for deleting stream values
+  void writeDeleteHeader(const char* feedId,
+                         const char* streamName,
+                         int contentLength);
   // Writes HTTP header lines including M2X API Key, host, content
   // type and content length(if the body exists)
   void writeHttpHeader(int contentLength);
