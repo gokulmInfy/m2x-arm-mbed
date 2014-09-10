@@ -13,8 +13,8 @@ M2XStreamClient m2xClient(&client, m2xKey);
 
 EthernetInterface eth;
 
-void on_data_point_found(const char* at, const char* value, int index, void* context) {
-  printf("Found a data point, index: %d\n", index);
+void on_data_point_found(const char* at, const char* value, int index, void* context, int type) {
+  printf("Found a data point, index: %d type: %d\n", index, type);
   printf("At: %s\n Value: %s\n", at, value);
 }
 

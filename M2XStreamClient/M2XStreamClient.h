@@ -48,10 +48,18 @@ static const int E_NOTREACHABLE = -3;
 static const int E_INVALID = -4;
 static const int E_JSON_INVALID = -5;
 
+/*
+ * +type+ indicates the value type: 1 for string, 2 for number
+ * NOTE that the value type here only contains a hint on how
+ * you can use the value. Even though 2 is returned, the value
+ * is still stored in (const char *), and atoi/atof is needed to
+ * get the actual value
+ */
 typedef void (*stream_value_read_callback)(const char* at,
                                            const char* value,
                                            int index,
-                                           void* context);
+                                           void* context,
+                                           int type);
 
 typedef void (*location_read_callback)(const char* name,
                                        double latitude,

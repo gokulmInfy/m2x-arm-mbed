@@ -40,8 +40,9 @@ static void on_stream_key_found(jsonlite_callback_context* context,
   }
 }
 
-static void on_stream_string_found(jsonlite_callback_context* context,
-                                   jsonlite_token* token)
+static void on_stream_value_found(jsonlite_callback_context* context,
+                                  jsonlite_token* token,
+                                  int type)
 {
   stream_parsing_context_state* state =
       (stream_parsing_context_state*) context->client_state;
@@ -60,9 +61,21 @@ static void on_stream_string_found(jsonlite_callback_context* context,
 
   if (TEST_GOT_STREAM(state->state)) {
     state->callback(state->at_str, state->value_str,
-                    state->index++, state->context);
+                    state->index++, state->context, type);
     state->state = 0;
   }
+}
+
+static void on_stream_string_found(jsonlite_callback_context* context,
+                                   jsonlite_token* token)
+{
+  on_stream_value_found(context, token, 1);
+}
+
+static void on_stream_number_found(jsonlite_callback_context* context,
+                                   jsonlite_token* token)
+{
+  on_stream_value_found(context, token, 2);
 }
 
 #endif  /* StreamParseFunctions_h */
