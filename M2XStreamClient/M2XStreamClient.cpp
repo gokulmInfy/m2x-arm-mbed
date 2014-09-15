@@ -160,7 +160,7 @@ void M2XStreamClient::writePutHeader(const char* feedId,
   print_encoded_string(_client, feedId);
   _client->print("/streams/");
   print_encoded_string(_client, streamName);
-  _client->println(" HTTP/1.0");
+  _client->println("/value HTTP/1.0");
 
   writeHttpHeader(contentLength);
 }
