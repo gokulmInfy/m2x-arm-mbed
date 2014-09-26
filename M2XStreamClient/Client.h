@@ -24,8 +24,12 @@ public:
   virtual uint8_t connected();
 private:
   virtual int read(uint8_t *buf, size_t size);
-  uint8_t _buf[1];
-  uint8_t _len;
+  void _fillin(void);
+  uint8_t _inbuf[128];
+  uint8_t _incnt;
+  void _flushout(void);
+  uint8_t _outbuf[128];
+  uint8_t _outcnt;
   TCPSocketConnection _sock;
 };
 
