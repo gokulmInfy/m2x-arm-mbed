@@ -8,13 +8,13 @@
 #ifdef ARDUINO_PLATFORM
 #include "Arduino.h"
 
-#define USER_AGENT "User-Agent: M2X Arduino Client/0.1"
+#define USER_AGENT "User-Agent: M2X Arduino Client/1.0.0"
 #endif
 
 #ifdef MBED_PLATFORM
 #include "mbed.h"
 
-#define USER_AGENT "User-Agent: M2X Mbed Client/0.1"
+#define USER_AGENT "User-Agent: M2X Mbed Client/1.0.0"
 #endif
 
 #include "Client.h"
