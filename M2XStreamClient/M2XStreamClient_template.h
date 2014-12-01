@@ -59,7 +59,7 @@ int M2XStreamClient::postDeviceUpdates(const char* deviceId, int streamNum,
                                        counts, ats, values);
     _client->print("POST /v2/devices/");
     print_encoded_string(_client, deviceId);
-    _client->println(" HTTP/1.0");
+    _client->println("/updates HTTP/1.0");
     writeHttpHeader(length);
     write_multiple_values(_client, streamNum, names, counts, ats, values);
   } else {
