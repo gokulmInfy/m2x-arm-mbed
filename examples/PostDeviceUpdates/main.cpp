@@ -23,8 +23,8 @@ int main() {
   printf("IP Address: %s\n", eth.getIPAddress());
 
   while (true) {
-    int response = m2xClient.postMultiple(feedId, 2, streamNames, counts, ats, values);
-    printf("Post response code: %d\n", response);
+    int response = m2xClient.postDeviceUpdates(feedId, 2, streamNames, counts, ats, values);
+    printf("Response code: %d\n", response);
 
     if (response == -1) while (true) ;
 

@@ -9,7 +9,7 @@ Getting Started
 ==========================
 1. Signup for an [M2X Account](https://m2x.att.com/signup).
 2. Obtain your _Master Key_ from the Master Keys tab of your [Account Settings](https://m2x.att.com/account) screen.
-2. Create your first [Data Source Blueprint](https://m2x.att.com/blueprints) and copy its _Feed ID_.
+2. Create your first [Data Source Blueprint](https://m2x.att.com/blueprints) and copy its _Device ID_.
 3. Review the [M2X API Documentation](https://m2x.att.com/developer/documentation/overview).
 4. Obtain an [mbed LPC1768](http://mbed.org/platforms/mbed-LPC1768/) and an [mbed application board](http://mbed.org/cookbook/mbed-application-board).
 
@@ -42,7 +42,7 @@ To run the examples, please follow the steps below:
     https://mbed.org/teams/ATT-M2X-team/code/M2XStreamClient/
     ```
 
-8. Create a file named `main.cpp`, and paste in any of the examples. Modify the M2X API Key, feed ID or stream name as needed by the examples.
+8. Create a file named `main.cpp`, and paste in any of the examples. Modify the M2X API Key, device ID or stream name as needed by the examples.
 9. When you are done, click `Compile`. if no error is found, a bin file will be downloaded to your computer.
 10. Copy that bin file to your mbed microcontroller, press the `reset` button, then you should be able to run the program!
 
@@ -56,7 +56,7 @@ M2X API Key
 
 Once you [register](https://m2x.att.com/signup) for an AT&amp;T M2X account, an API key is automatically generated for you. This key is called a _Primary Master Key_ and can be found in the _Master Keys_ tab of your [Account Settings](https://m2x.att.com/account). This key cannot be edited nor deleted, but it can be regenerated. It will give you full access to all APIs.
 
-However, you can also create a _Data Source API Key_ associated with a given Data Source(Feed), you can use the Data Source API key to access the streams belonging to that Data Source.
+However, you can also create a _Data Source API Key_ associated with a given Data Source(Device), you can use the Data Source API key to access the streams belonging to that Data Source.
 
 You can customize this variable in the following line in the examples:
 
@@ -64,19 +64,19 @@ You can customize this variable in the following line in the examples:
 char m2xKey[] = "<M2X access key>";
 ```
 
-Feed ID
+Device ID
 -------
 
-A feed is associated with a data source, it is a set of data streams, such as streams of locations, temperatures, etc. The following line is needed to configure the feed used:
+A device is associated with a data source, it is a set of data streams, such as streams of locations, temperatures, etc. The following line is needed to configure the device used:
 
 ```
-char feedId[] = "<feed id>";
+char deviceId[] = "<device id>";
 ```
 
 Stream Name
 ------------
 
-A stream in a feed is a set of timed series data of a specific type(i,e. humidity, temperature), you can use the M2XStreamClient library to send stream values to M2X server, or receive stream values from M2X server. Use the following line to configure the stream if needed:
+A stream in a device is a set of timed series data of a specific type(i,e. humidity, temperature), you can use the M2XStreamClient library to send stream values to M2X server, or receive stream values from M2X server. Use the following line to configure the stream if needed:
 
 ```
 char streamName[] = "<stream name>";
@@ -85,12 +85,14 @@ char streamName[] = "<stream name>";
 Using the M2XStreamClient library
 =========================
 
-In the M2XStreamClient, 4 types of API functions are provided here:
+In the M2XStreamClient, the following API functions are provided:
 
-* `send`: Send stream value to M2X server
-* `receive`: Receive stream value from M2X server
-* `updateLocation`: Send location value of a feed to M2X server
-* `readLocation`: Receive location values of a feed from M2X server
+* `updateStreamValue`: Send stream value to M2X server
+* `postDeviceUpdates`: Post values from multiple streams to M2X server
+* `listStreamValues`: Receive stream value from M2X server
+* `updateLocation`: Send location value of a device to M2X server
+* `readLocation`: Receive location values of a device from M2X server
+* `deleteValues`: Delete stream values from M2X server
 
 Returned values
 ---------------
@@ -107,33 +109,33 @@ static const int E_INVALID = -4;
 static const int E_JSON_INVALID = -5;
 ```
 
-Post stream value
------------------
+Update stream value
+-------------------
 
-The following functions can be used to post value to a stream, which belongs to a feed:
+The following functions can be used to post one single value to a stream, which belongs to a device:
 
 ```
 template <class T>
-int post(const char* feedId, const char* streamName, T value);
+int updateStreamValue(const char* deviceId, const char* streamName, T value);
 ```
 
 Here we use C++ templates to generate functions for different types of values, feel free to use values of `float`, `int`, `long` or even `const char*` types here.
 
-Post multiple values
---------------------
+Post device updates
+-------------------
 
 M2X also supports posting multiple values to multiple streams in one call, use the following function for this:
 
 ```
 template <class T>
-int postMultiple(const char* feedId, int streamNum,
-                 const char* names[], const int counts[],
-                 const char* ats[], T values[]);
+int postDeviceUpdates(const char* deviceId, int streamNum,
+                      const char* names[], const int counts[],
+                      const char* ats[], T values[]);
 ```
 
 Please refer to the comments in the source code on how to use this function, basically, you need to provide the list of streams you want to post to, and values for each stream.
 
-Fetch stream value
+List stream values
 ------------------
 
 Since mbed microcontroller contains very limited memory, we cannot put the whole returned string in memory, parse it into JSON representations and read what we want. Instead, we use a callback-based mechanism here. We parse the returned JSON string piece by piece, whenever we got a new stream value point, we will call the following callback functions:
@@ -153,26 +155,29 @@ The implementation of the callback function is left for the user to fill in, you
 To read the stream values, all you need to do is calling this function:
 
 ```
-int fetchValues(const char* feedId, const char* streamName,
-                stream_value_read_callback callback, void* context,
-                const char* startTime = NULL, const char* endTime = NULL,
-                const char* limit = NULL);
+int listStreamValues(const char* deviceId, const char* streamName,
+                     stream_value_read_callback callback, void* context,
+                     const char* query = NULL);
 ```
 
-Besides the feed ID and stream name, only the callback function and a user context needs to be specified. Optional filtering parameters such as start time, end time and limits per call can also be used here.
+Besides the device ID and stream name, only the callback function and a user context needs to be specified. Optional query parameters might also be available here, for example, the current query parameter picks value from a specific range:
+
+```
+start=2014-10-01T00:00:00Z&end=2014-10-10T00:00:00Z
+```
 
 Update Datasource Location
 --------------------------
 
-You can use the following function to update the location for a data source(feed):
+You can use the following function to update the location for a data source(device):
 
 ```
 template <class T>
-int updateLocation(const char* feedId, const char* name,
+int updateLocation(const char* deviceId, const char* name,
                    T latitude, T longitude, T elevation);
 ```
 
-Different from stream values, locations are attached to feeds rather than streams. We use templates here, since the values may be in different format, for example, you can express latitudes in both `double` and `const char*`.
+Different from stream values, locations are attached to devices rather than streams. We use templates here, since the values may be in different format, for example, you can express latitudes in both `double` and `const char*`.
 
 Read Datasource Location
 ------------------------
@@ -195,11 +200,22 @@ For memory space consideration, now we only provide double-precision when readin
 The API is also slightly different, in that the stream name is not needed here:
 
 ```
-int readLocation(const char* feedId, location_read_callback callback,
+int readLocation(const char* deviceId, location_read_callback callback,
                  void* context);
 
 ```
 
+Delete stream values
+--------------------
+
+The following function can be used to delete stream values within a date range:
+
+```
+int deleteValues(const char* deviceId, const char* streamName,
+                 const char* from, const char* end);
+```
+
+`from` and `end` fields here follow ISO 8601 time format.
 
 How to read Serial output
 =========================
@@ -213,20 +229,20 @@ We provide a series of examples that will help you get an idea of how to use the
 
 Note that the examples contain fictionary variables, and that they need to be configured as per the instructions above before running on your mbed microcontroller. Each of the examples here also needs an Internet connection setup, either via an Ethernet port or a Wifi module.
 
-In the `Post` example, the temperature sensor on the mbed application board is needed. For other examples, no extra modules are needed besides the network connection.
+In the `UpdateStreamValue` example, the temperature sensor on the mbed application board is needed. For other examples, no extra modules are needed besides the network connection.
 
-Post
-----
+UpdateStreamValue
+-----------------
 
-This example shows how to post temperatures to M2X server. Before running this, you need to have a valid M2X Key, a feed ID and a stream name. The mbed microcontroller need to be hooked on the mbed application board in order to use the temperature sensor.
+This example shows how to post temperatures to M2X server. Before running this, you need to have a valid M2X Key, a device ID and a stream name. The mbed microcontroller need to be hooked on the mbed application board in order to use the temperature sensor.
 
-PostMultiple
-------------
+PostDeviceUpdates
+-----------------
 
 This example shows how to post multiple values to multiple streams in one API call.
 
-FetchValues
------------
+ListStreamValues
+----------------
 
 This example reads stream values from M2X server. And prints the stream data point got to Serial interface. You can find the actual values in the Serial output.
 
@@ -238,7 +254,12 @@ This one sends location data to M2X server. Idealy a GPS device should be used h
 ReadLocation
 ------------
 
-This one reads location data of a feed from M2X server, and prints them to Serial interfact. You can check the output in the Serial output.
+This one reads location data of a device from M2X server, and prints them to Serial interfact. You can check the output in the Serial output.
+
+DeleteValues
+------------
+
+This example shows how to delete stream values within a specific range from M2X server.
 
 License
 =======

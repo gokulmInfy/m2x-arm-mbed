@@ -8,7 +8,7 @@ char feedId[] = "<feed id>"; // Feed you want to read location
 char m2xKey[] = "<m2x api key>"; // Your M2X API Key or Master API Key
 
 Client client;
-M2XStreamClient m2xClient(&client, m2xKey, "192.168.1.4", 9393);
+M2XStreamClient m2xClient(&client, m2xKey);
 
 EthernetInterface eth;
 

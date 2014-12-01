@@ -37,36 +37,23 @@ M2XStreamClient::M2XStreamClient(Client* client,
                                              _null_print() {
 }
 
-#define WRITE_QUERY_PART(client_, started_, name_, str_) { \
-  if (str_) { \
-    if (started_) { \
-      (client_)->print("&"); \
-    } else { \
-      (client_)->print("?"); \
-      started_ = true; \
-    } \
-    (client_)->print(name_ "="); \
-    (client_)->print(str_); \
-  } \
-  }
-
-int M2XStreamClient::fetchValues(const char* feedId, const char* streamName,
-                                 stream_value_read_callback callback, void* context,
-                                 const char* startTime, const char* endTime,
-                                 const char* limit) {
+int M2XStreamClient::listStreamValues(const char* deviceId, const char* streamName,
+                                      stream_value_read_callback callback, void* context,
+                                      const char* query) {
   if (_client->connect(_host, _port)) {
-    bool query_started = false;
-
     DBGLN("%s", "Connected to M2X server!");
-    _client->print("GET /v1/feeds/");
-    print_encoded_string(_client, feedId);
+    _client->print("GET /v2/devices/");
+    print_encoded_string(_client, deviceId);
     _client->print("/streams/");
     print_encoded_string(_client, streamName);
-    _client->print("/values");
+    _client->print("/values.json");
 
-    WRITE_QUERY_PART(_client, query_started, "start", startTime);
-    WRITE_QUERY_PART(_client, query_started, "end", endTime);
-    WRITE_QUERY_PART(_client, query_started, "limit", limit);
+    if (query) {
+      if (query[0] != '?') {
+        _client->print('?');
+      }
+      _client->print(query);
+    }
 
     _client->println(" HTTP/1.0");
     writeHttpHeader(-1);
@@ -83,13 +70,13 @@ int M2XStreamClient::fetchValues(const char* feedId, const char* streamName,
   return status;
 }
 
-int M2XStreamClient::readLocation(const char* feedId,
+int M2XStreamClient::readLocation(const char* deviceId,
                                   location_read_callback callback,
                                   void* context) {
   if (_client->connect(_host, _port)) {
     DBGLN("%s", "Connected to M2X server!");
-    _client->print("GET /v1/feeds/");
-    print_encoded_string(_client, feedId);
+    _client->print("GET /v2/devices/");
+    print_encoded_string(_client, deviceId);
     _client->println("/location HTTP/1.0");
 
     writeHttpHeader(-1);
@@ -106,12 +93,12 @@ int M2XStreamClient::readLocation(const char* feedId,
   return status;
 }
 
-int M2XStreamClient::deleteValues(const char* feedId, const char* streamName,
+int M2XStreamClient::deleteValues(const char* deviceId, const char* streamName,
                                   const char* from, const char* end) {
   if (_client->connect(_host, _port)) {
     DBGLN("%s", "Connected to M2X server!");
     int length = write_delete_values(&_null_print, from, end);
-    writeDeleteHeader(feedId, streamName, length);
+    writeDeleteHeader(deviceId, streamName, length);
     write_delete_values(_client, from, end);
   } else {
     DBGLN("%s", "ERROR: Cannot connect to M2X server!");
@@ -153,11 +140,11 @@ int print_encoded_string(Print* print, const char* str) {
   return bytes;
 }
 
-void M2XStreamClient::writePutHeader(const char* feedId,
+void M2XStreamClient::writePutHeader(const char* deviceId,
                                      const char* streamName,
                                      int contentLength) {
-  _client->print("PUT /v1/feeds/");
-  print_encoded_string(_client, feedId);
+  _client->print("PUT /v2/devices/");
+  print_encoded_string(_client, deviceId);
   _client->print("/streams/");
   print_encoded_string(_client, streamName);
   _client->println("/value HTTP/1.0");
@@ -165,11 +152,11 @@ void M2XStreamClient::writePutHeader(const char* feedId,
   writeHttpHeader(contentLength);
 }
 
-void M2XStreamClient::writeDeleteHeader(const char* feedId,
+void M2XStreamClient::writeDeleteHeader(const char* deviceId,
                                         const char* streamName,
                                         int contentLength) {
-  _client->print("DELETE /v1/feeds/");
-  print_encoded_string(_client, feedId);
+  _client->print("DELETE /v2/devices/");
+  print_encoded_string(_client, deviceId);
   _client->print("/streams/");
   print_encoded_string(_client, streamName);
   _client->print("/values");

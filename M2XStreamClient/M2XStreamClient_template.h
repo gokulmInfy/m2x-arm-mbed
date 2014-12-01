@@ -6,10 +6,10 @@
 int print_encoded_string(Print* print, const char* str);
 
 template <class T>
-int M2XStreamClient::put(const char* feedId, const char* streamName, T value) {
+int M2XStreamClient::updateStreamValue(const char* deviceId, const char* streamName, T value) {
   if (_client->connect(_host, _port)) {
     DBGLN("%s", "Connected to M2X server!");
-    writePutHeader(feedId, streamName,
+    writePutHeader(deviceId, streamName,
                    //  for {"value": and }
                    _null_print.print(value) + 10);
     _client->print("{\"value\":");
@@ -50,15 +50,15 @@ inline int write_multiple_values(Print* print, int streamNum,
 }
 
 template <class T>
-int M2XStreamClient::postMultiple(const char* feedId, int streamNum,
-                                  const char* names[], const int counts[],
-                                  const char* ats[], T values[]) {
+int M2XStreamClient::postDeviceUpdates(const char* deviceId, int streamNum,
+                                       const char* names[], const int counts[],
+                                       const char* ats[], T values[]) {
   if (_client->connect(_host, _port)) {
     DBGLN("%s", "Connected to M2X server!");
     int length = write_multiple_values(&_null_print, streamNum, names,
                                        counts, ats, values);
-    _client->print("POST /v1/feeds/");
-    print_encoded_string(_client, feedId);
+    _client->print("POST /v2/devices/");
+    print_encoded_string(_client, deviceId);
     _client->println(" HTTP/1.0");
     writeHttpHeader(length);
     write_multiple_values(_client, streamNum, names, counts, ats, values);
@@ -103,7 +103,7 @@ static int write_location_data(Print* print, const char* name,
 }
 
 template <class T>
-int M2XStreamClient::updateLocation(const char* feedId,
+int M2XStreamClient::updateLocation(const char* deviceId,
                                     const char* name,
                                     T latitude,
                                     T longitude,
@@ -113,8 +113,8 @@ int M2XStreamClient::updateLocation(const char* feedId,
 
     int length = write_location_data(&_null_print, name, latitude, longitude,
                                      elevation);
-    _client->print("PUT /v1/feeds/");
-    print_encoded_string(_client, feedId);
+    _client->print("PUT /v2/devices/");
+    print_encoded_string(_client, deviceId);
     _client->println("/location HTTP/1.0");
 
     writeHttpHeader(length);

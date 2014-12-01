@@ -24,8 +24,8 @@ int main() {
     double val = tmp.read();
     printf("Current temperature is: %lf", val);
 
-    int response = m2xClient.put(feedId, streamName, val);
-    printf("Put response code: %d\n", response);
+    int response = m2xClient.updateStreamValue(feedId, streamName, val);
+    printf("Response code: %d\n", response);
 
     if (response == -1) while (true) ;
 

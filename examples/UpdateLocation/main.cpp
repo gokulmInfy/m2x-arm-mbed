@@ -13,7 +13,7 @@ double longitude = -57.54787; // You can also read those values from a GPS
 double elevation = 15;
 
 Client client;
-M2XStreamClient m2xClient(&client, m2xKey, "192.168.1.4", 9393);
+M2XStreamClient m2xClient(&client, m2xKey);
 
 EthernetInterface eth;
 
