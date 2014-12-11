@@ -67,7 +67,7 @@ char m2xKey[] = "<M2X access key>";
 Device ID
 -------
 
-A device is associated with a data source, it is a set of data streams, such as streams of locations, temperatures, etc. The following line is needed to configure the device used:
+A device is associated with a source of data. It is a set of data streams, such as streams of locations, temperatures, etc. The following line is needed to configure the device used:
 
 ```
 char deviceId[] = "<device id>";
@@ -76,7 +76,7 @@ char deviceId[] = "<device id>";
 Stream Name
 ------------
 
-A stream in a device is a set of timed series data of a specific type(i,e. humidity, temperature), you can use the M2XStreamClient library to send stream values to M2X server, or receive stream values from M2X server. Use the following line to configure the stream if needed:
+A stream in a device is a set of timed series data of a specific type (i,e. humidity, temperature), you can use the M2XStreamClient library to send stream values to M2X server, or receive stream values from M2X server. Use the following line to configure the stream if needed:
 
 ```
 char streamName[] = "<stream name>";
