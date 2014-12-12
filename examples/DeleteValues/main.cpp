@@ -4,7 +4,7 @@
 #include "mbed.h"
 #include "EthernetInterface.h"
 
-char feedId[] = "<feed id>"; // Feed you want to delete values
+char deviceId[] = "<device id>"; // Device you want to delete values
 char streamName[] = "<stream name>"; // Stream you want to delete values
 char m2xKey[] = "<M2X access key>"; // Your M2X access key
 
@@ -22,7 +22,7 @@ int main() {
   printf("IP Address: %s\n", eth.getIPAddress());
 
   // Delete values
-  int response = m2xClient.deleteValues(feedId,
+  int response = m2xClient.deleteValues(deviceId,
                                         streamName,
                                         fromTime,
                                         endTime);

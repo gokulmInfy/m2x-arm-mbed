@@ -4,7 +4,7 @@
 #include "mbed.h"
 #include "EthernetInterface.h"
 
-char feedId[] = "<feed id>"; // Feed you want to receive values
+char deviceId[] = "<device id>"; // Device you want to receive values
 char streamName[] = "<stream name>"; // Stream you want to receive values
 char m2xKey[] = "<m2x api key>"; // Your M2X API Key or Master API Key
 
@@ -24,7 +24,7 @@ int main() {
   printf("IP Address: %s\n", eth.getIPAddress());
 
   while (true) {
-    int response = m2xClient.listStreamValues(feedId, streamName, on_data_point_found, NULL);
+    int response = m2xClient.listStreamValues(deviceId, streamName, on_data_point_found, NULL);
     printf("Response code: %d\n", response);
 
     if (response == -1) while (true) ;

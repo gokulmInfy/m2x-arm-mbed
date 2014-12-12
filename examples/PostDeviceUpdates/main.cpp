@@ -4,7 +4,7 @@
 #include "mbed.h"
 #include "EthernetInterface.h"
 
-char feedId[] = "<feed id>"; // Feed you want to post to
+char deviceId[] = "<device id>"; // Device you want to post to
 char m2xKey[] = "<m2x api key>"; // Your M2X API Key or Master API Key
 
 const char *streamNames[] = { "temperature", "humidity" };
@@ -23,7 +23,7 @@ int main() {
   printf("IP Address: %s\n", eth.getIPAddress());
 
   while (true) {
-    int response = m2xClient.postDeviceUpdates(feedId, 2, streamNames, counts, ats, values);
+    int response = m2xClient.postDeviceUpdates(deviceId, 2, streamNames, counts, ats, values);
     printf("Response code: %d\n", response);
 
     if (response == -1) while (true) ;
