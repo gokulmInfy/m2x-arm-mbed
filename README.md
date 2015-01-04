@@ -15,6 +15,8 @@ Getting Started
 
 **NOTE**: Though [similiar boards](http://mbed.org/cookbook/Homepage) exist and may also do the job, this doc is specific to using a combination of mbed LPC1768 microcontroller and mbed application board
 
+**ublox** Modem/GPS shield users can find a m2x working demo with freescale boards on the mbed website [here](http://developer.mbed.org/teams/ublox/code/Cellular_m2x-demo-all/).
+
 Please consult the [M2X glossary](https://m2x.att.com/developer/documentation/glossary) if you have questions about any M2X specific terms.
 
 How to run the examples
