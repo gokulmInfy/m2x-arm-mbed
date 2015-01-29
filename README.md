@@ -10,14 +10,14 @@ Getting Started
 1. Signup for an [M2X Account](https://m2x.att.com/signup).
 2. Obtain your _Master Key_ from the Master Keys tab of your [Account Settings](https://m2x.att.com/account) screen.
 2. Create your first [Device](https://m2x.att.com/devices) and copy its _Device ID_.
-3. Review the [M2X API Documentation](https://m2x.att.com/developer/documentation/v2/overview).
+3. Review the [M2X API Documentation](https://m2x.att.com/developer/documentation/overview).
 4. Obtain an [mbed LPC1768](http://mbed.org/platforms/mbed-LPC1768/) and an [mbed application board](http://mbed.org/cookbook/mbed-application-board).
 
 **NOTE**: Though [similiar boards](http://mbed.org/cookbook/Homepage) exist and may also do the job, this doc is specific to using a combination of mbed LPC1768 microcontroller and mbed application board
 
 **ublox** Modem/GPS shield users can find a m2x working demo with freescale boards on the mbed website [here](http://developer.mbed.org/teams/ublox/code/Cellular_m2x-demo-all/).
 
-Please consult the [M2X glossary](https://m2x.att.com/developer/documentation/v2/glossary) if you have questions about any M2X specific terms.
+Please consult the [M2X glossary](https://m2x.att.com/developer/documentation/glossary) if you have questions about any M2X specific terms.
 
 How to run the examples
 =======================
