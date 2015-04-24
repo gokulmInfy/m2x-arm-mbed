@@ -12,9 +12,9 @@ int M2XStreamClient::updateStreamValue(const char* deviceId, const char* streamN
     writePutHeader(deviceId, streamName,
                    //  for {"value": and }
                    _null_print.print(value) + 10);
-    _client->print("{\"value\":");
+    _client->print("{\"value\":\"");
     _client->print(value);
-    _client->print("}");
+    _client->print("\"}");
   } else {
     DBGLN("%s", "ERROR: Cannot connect to M2X server!");
     return E_NOCONNECTION;
