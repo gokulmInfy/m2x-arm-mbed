@@ -29,11 +29,13 @@ M2XStreamClient::M2XStreamClient(Client* client,
                                  const char* key,
                                  int case_insensitive,
                                  const char* host,
-                                 int port) : _client(client),
+                                 int port,
+                                 const char* path_prefix) : _client(client),
                                              _key(key),
                                              _case_insensitive(case_insensitive),
                                              _host(host),
                                              _port(port),
+                                             _path_prefix(path_prefix),
                                              _null_print() {
 }
 
@@ -42,7 +44,10 @@ int M2XStreamClient::listStreamValues(const char* deviceId, const char* streamNa
                                       const char* query) {
   if (_client->connect(_host, _port)) {
     DBGLN("%s", "Connected to M2X server!");
-    _client->print("GET /v2/devices/");
+    _client->print("GET ");
+    if (_path_prefix)
+        _client->print(_path_prefix);
+    _client->print("/v2/devices/");
     print_encoded_string(_client, deviceId);
     _client->print("/streams/");
     print_encoded_string(_client, streamName);
@@ -75,7 +80,10 @@ int M2XStreamClient::readLocation(const char* deviceId,
                                   void* context) {
   if (_client->connect(_host, _port)) {
     DBGLN("%s", "Connected to M2X server!");
-    _client->print("GET /v2/devices/");
+    _client->print("GET ");
+    if (_path_prefix)
+        _client->print(_path_prefix);
+    _client->print("/v2/devices/");
     print_encoded_string(_client, deviceId);
     _client->println("/location HTTP/1.0");
 
@@ -143,7 +151,10 @@ int print_encoded_string(Print* print, const char* str) {
 void M2XStreamClient::writePutHeader(const char* deviceId,
                                      const char* streamName,
                                      int contentLength) {
-  _client->print("PUT /v2/devices/");
+  _client->print("PUT ");
+  if (_path_prefix)
+    _client->print(_path_prefix);
+  _client->print("/v2/devices/");
   print_encoded_string(_client, deviceId);
   _client->print("/streams/");
   print_encoded_string(_client, streamName);
@@ -155,7 +166,10 @@ void M2XStreamClient::writePutHeader(const char* deviceId,
 void M2XStreamClient::writeDeleteHeader(const char* deviceId,
                                         const char* streamName,
                                         int contentLength) {
-  _client->print("DELETE /v2/devices/");
+  _client->print("DELETE ");
+  if (_path_prefix)
+    _client->print(_path_prefix);
+  _client->print("/v2/devices/");
   print_encoded_string(_client, deviceId);
   _client->print("/streams/");
   print_encoded_string(_client, streamName);

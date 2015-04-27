@@ -32,7 +32,7 @@ static void on_stream_key_found(jsonlite_callback_context* context,
 {
   stream_parsing_context_state* state =
       (stream_parsing_context_state*) context->client_state;
-  if (strncmp((const char*) token->start, "timestamp", 9) == 0) {
+  if (strncmp((const char*) token->start, "timestamp", 2) == 0) {
     state->state |= WAITING_AT;
   } else if ((strncmp((const char*) token->start, "value", 5) == 0) &&
              (token->start[5] != 's')) { // get rid of "values"

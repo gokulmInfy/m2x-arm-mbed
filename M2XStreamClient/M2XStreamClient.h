@@ -8,7 +8,7 @@
 #ifdef ARDUINO_PLATFORM
 #include "Arduino.h"
 
-#define USER_AGENT "User-Agent: M2X Arduino Client/2.0.0"
+#define USER_AGENT "User-Agent: M2X Arduino Client/2.0.2"
 #endif
 
 #ifdef MBED_PLATFORM
@@ -78,7 +78,8 @@ public:
                   const char* key,
                   int case_insensitive = 1,
                   const char* host = kDefaultM2XHost,
-                  int port = kDefaultM2XPort);
+                  int port = kDefaultM2XPort,
+                  const char* path_prefix = NULL);
 
   // Push data stream value using PUT request, returns the HTTP status code
   template <class T>
@@ -169,6 +170,7 @@ private:
   int _case_insensitive;
   const char* _host;
   int _port;
+  const char* _path_prefix;
   NullPrint _null_print;
 
   // Writes the HTTP header part for updating a stream value

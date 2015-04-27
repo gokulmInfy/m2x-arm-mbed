@@ -10,8 +10,8 @@ int M2XStreamClient::updateStreamValue(const char* deviceId, const char* streamN
   if (_client->connect(_host, _port)) {
     DBGLN("%s", "Connected to M2X server!");
     writePutHeader(deviceId, streamName,
-                   //  for {"value": and }
-                   _null_print.print(value) + 10);
+                   //  for {"value":" and "}
+                   _null_print.print(value) + 12);
     _client->print("{\"value\":\"");
     _client->print(value);
     _client->print("\"}");
@@ -57,7 +57,10 @@ int M2XStreamClient::postDeviceUpdates(const char* deviceId, int streamNum,
     DBGLN("%s", "Connected to M2X server!");
     int length = write_multiple_values(&_null_print, streamNum, names,
                                        counts, ats, values);
-    _client->print("POST /v2/devices/");
+    _client->print("POST ");
+    if (_path_prefix)
+      _client->print(_path_prefix);
+    _client->print("/v2/devices/");
     print_encoded_string(_client, deviceId);
     _client->println("/updates HTTP/1.0");
     writeHttpHeader(length);
@@ -113,7 +116,10 @@ int M2XStreamClient::updateLocation(const char* deviceId,
 
     int length = write_location_data(&_null_print, name, latitude, longitude,
                                      elevation);
-    _client->print("PUT /v2/devices/");
+    _client->print("PUT ");
+    if (_path_prefix)
+      _client->print(_path_prefix);
+    _client->print("/v2/devices/");
     print_encoded_string(_client, deviceId);
     _client->println("/location HTTP/1.0");
 
