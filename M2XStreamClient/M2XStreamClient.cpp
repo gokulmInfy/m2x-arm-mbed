@@ -116,6 +116,73 @@ int M2XStreamClient::deleteValues(const char* deviceId, const char* streamName,
   return readStatusCode(true);
 }
 
+int M2XStreamClient::getTimestamp32(int32_t *ts) {
+  // The maximum value of signed 64-bit integer is 0x7fffffffffffffff,
+  // which is 9223372036854775807. It consists of 19 characters, so a
+  // buffer of 20 is definitely enough here
+  int length = 20;
+  char buffer[20];
+  int status = getTimestamp(buffer, &length);
+  if (status == 200) {
+    int32_t result = 0;
+    for (int i = 0; i < length; i++) {
+      result = result * 10 + (buffer[i] - '0');
+    }
+    if (ts != NULL) { *ts = result; }
+  }
+  return status;
+}
+
+int M2XStreamClient::getTimestamp(char* buffer, int *bufferLength) {
+  if (bufferLength == NULL) { return E_INVALID; }
+  if (_client->connect(_host, _port)) {
+    DBGLN("%s", "Connected to M2X server!");
+    _client->println("GET /v2/time/seconds HTTP/1.0");
+
+    writeHttpHeader(-1);
+  } else {
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
+    return E_NOCONNECTION;
+  }
+  int status = readStatusCode(false);
+  if (status == 200) {
+    int length = readContentLength();
+    if (length < 0) {
+      close();
+      return length;
+    }
+    if (*bufferLength < length) {
+      *bufferLength = length;
+      return E_BUFFER_TOO_SMALL;
+    }
+    *bufferLength = length;
+    int index = skipHttpHeader();
+    if (index != E_OK) {
+      close();
+      return index;
+    }
+    index = 0;
+    while (index < length) {
+      DBG("%s", "Received Data: ");
+      while ((index < length) && _client->available()) {
+        buffer[index++] = _client->read();
+        DBG("%c", buffer[index - 1]);
+      }
+      DBGLNEND;
+
+      if ((!_client->connected()) &&
+          (index < length)) {
+        close();
+        return E_NOCONNECTION;
+      }
+
+      delay(200);
+    }
+  }
+  close();
+  return status;
+}
+
 static int write_delete_values(Print* print, const char* from,
                                const char* end) {
   int bytes = 0;
@@ -317,7 +384,7 @@ int M2XStreamClient::readContentLength() {
 }
 
 int M2XStreamClient::skipHttpHeader() {
-  return waitForString("\r\n\r\n");
+  return waitForString("\n\r\n");
 }
 
 void M2XStreamClient::close() {

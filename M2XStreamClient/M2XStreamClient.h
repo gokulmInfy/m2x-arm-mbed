@@ -47,6 +47,25 @@ static const int E_DISCONNECTED = -2;
 static const int E_NOTREACHABLE = -3;
 static const int E_INVALID = -4;
 static const int E_JSON_INVALID = -5;
+static const int E_BUFFER_TOO_SMALL = -6;
+static const int E_TIMESTAMP_ERROR = -8;
+
+static inline bool m2x_status_is_success(int status) {
+  return (status == E_OK) || (status >= 200 && status <= 299);
+}
+
+static inline bool m2x_status_is_client_error(int status) {
+  return status >= 400 && status <= 499;
+}
+
+static inline bool m2x_status_is_server_error(int status) {
+  return status >= 500 && status <= 599;
+}
+
+static inline bool m2x_status_is_error(int status) {
+  return m2x_status_is_client_error(status) ||
+      m2x_status_is_server_error(status);
+}
 
 /*
  * +type+ indicates the value type: 1 for string, 2 for number
@@ -164,6 +183,55 @@ public:
   // or equal to the end timestamp.
   int deleteValues(const char* deviceId, const char* streamName,
                    const char* from, const char* end);
+
+  // Fetches current timestamp in seconds from M2X server. Since we
+  // are using signed 32-bit integer as return value, this will only
+  // return valid results before 03:14:07 UTC on 19 January 2038. If
+  // the device is supposed to work after that, this function should
+  // not be used.
+  //
+  // The returned value will contain the status code(positive values)
+  // or the error code(negative values).
+  // In case of success, the current timestamp will be filled in the
+  // +ts+ pointer passed in as argument.
+  //
+  // NOTE: although returning uint32_t can give us a larger space,
+  // we prefer to cope with the unix convention here.
+  int getTimestamp32(int32_t* ts);
+
+  // Fetches current timestamp in seconds from M2X server.
+  // This function will return the timestamp as an integer literal
+  // in the provided buffer. Hence there's no problem working after
+  // 03:14:07 UTC on 19 January 2038. The drawback part here, is that
+  // you will have to work with 64-bit integer, which is not available
+  // on certain platform(such as Arduino), a bignum library or alike
+  // is needed in this case.
+  //
+  // Notice +bufferLength+ is supposed to contain the length of the
+  // buffer when calling this function. It is also the caller's
+  // responsibility to ensure the buffer is big enough, otherwise
+  // the library will return an error indicating the buffer is too
+  // small.
+  // While this is not accurate all the time, one trick here is to
+  // pass in 0 as the bufferLength, in which case we will always return
+  // the buffer-too-small error. However, the correct buffer length
+  // can be found this way so a secound execution is most likely to work
+  // (unless we are at the edge of the buffer length increasing, for
+  // example, when the timestamp jumps from 9999999999 to 10000000000,
+  // which is highly unlikely to happend). However, given that the
+  // maximum 64-bit integer can be stored in 19 bytes, there's not
+  // much need to use this trick.)
+  //
+  // The returned value will contain the status code(positive values)
+  // or the error code(negative values).
+  // In case of success, the current timestamp will be filled in the
+  // passed +buffer+ pointer, and the actual used buffer length will
+  // be returned in +bufferLength+ pointer.
+  // NOTE: as long as we can read the returned buffer length, it will
+  // be used to fill in the +bufferLength+ variable even though other
+  // errors occur(buffer is not enough, network is shutdown before
+  // reading the whole buffer, etc.)
+  int getTimestamp(char* buffer, int* bufferLength);
 private:
   Client* _client;
   const char* _key;
@@ -209,5 +277,6 @@ private:
 };
 
 #include "M2XStreamClient_template.h"
+#include "TimeService.h"
 
 #endif  /* M2XStreamClient_h */
