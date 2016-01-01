@@ -14,7 +14,7 @@
 #ifdef MBED_PLATFORM
 #include "mbed.h"
 
-#define USER_AGENT "User-Agent: M2X Mbed Client/2.1.0"
+#define USER_AGENT "User-Agent: M2X Mbed Client/2.1.1"
 #endif
 
 #include "Client.h"
