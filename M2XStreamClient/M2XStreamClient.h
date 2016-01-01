@@ -127,6 +127,20 @@ public:
                         const char* names[], const int counts[],
                         const char* ats[], T values[]);
 
+  // Post multiple values of a single device at once.
+  // +deviceId+ - id of the device to post values
+  // +streamNum+ - Number of streams to post
+  // +names+ - Array of stream names, the length of the array should
+  // be exactly +streamNum+
+  // +values+ - Array of values to post, the length of the array should
+  // be exactly +streamNum+. Notice that the array of +values+ should
+  // match the array of +names+, and that the ith value in +values+ is
+  // exactly the value to post for the ith stream name in +names+
+  template <class T>
+  int postSingleDeviceUpdate(const char* deviceId, int streamNum,
+                             const char* names[], T values[],
+                             const char* at = NULL);
+
   // Fetch values for a particular data stream. Since memory is
   // very limited on an Arduino, we cannot parse and get all the
   // data points in memory. Instead, we use callbacks here: whenever

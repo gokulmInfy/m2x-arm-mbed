@@ -73,6 +73,54 @@ int M2XStreamClient::postDeviceUpdates(const char* deviceId, int streamNum,
 }
 
 template <class T>
+inline int write_single_device_values(Print* print, int streamNum,
+                                      const char* names[], T values[],
+                                      const char* at) {
+  int bytes = 0;
+  bytes += print->print("{\"values\":{");
+  for (int i = 0; i < streamNum; i++) {
+    bytes += print->print("\"");
+    bytes += print->print(names[i]);
+    bytes += print->print("\": \"");
+    bytes += print->print(values[value_index]);
+    bytes += print->print("\"");
+    if (i < streamNum - 1) { bytes += print->print(","); }
+  }
+  bytes += print->print("}");
+  if (at != NULL) {
+    bytes += print->print(",\"timestamp\":\"");
+    bytes += print->print(at);
+    bytes += print->print("\"");
+  }
+  bytes += print->print("}");
+  return bytes;
+}
+
+template <class T>
+int M2XStreamClient::postSingleDeviceUpdate(const char* deviceId, int streamNum,
+                                            const char* names[], T values[],
+                                            const char* at) {
+  if (_client->connect(_host, _port)) {
+    DBGLN("%s", "Connected to M2X server!");
+    int length = write_single_device_values(&_null_print, streamNum, names,
+                                            values, at);
+    _client->print("POST ");
+    if (_path_prefix) {
+      _client->print(_path_prefix);
+    }
+    _client->print("/v2/devices/");
+    print_encoded_string(_client, deviceId);
+    _client->println("/update HTTP/1.0");
+    writeHttpHeader(length);
+    write_single_device_values(_client, streamNum, names, values, at);
+  } else {
+    DBGLN("%s", "ERROR: Cannot connect to M2X server!");
+    return E_NOCONNECTION;
+  }
+  return readStatusCode(true);
+}
+
+template <class T>
 static int write_location_data(Print* print, const char* name,
                                T latitude, T longitude,
                                T elevation) {
