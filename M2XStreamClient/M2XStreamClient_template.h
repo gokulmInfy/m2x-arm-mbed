@@ -82,7 +82,7 @@ inline int write_single_device_values(Print* print, int streamNum,
     bytes += print->print("\"");
     bytes += print->print(names[i]);
     bytes += print->print("\": \"");
-    bytes += print->print(values[value_index]);
+    bytes += print->print(values[i]);
     bytes += print->print("\"");
     if (i < streamNum - 1) { bytes += print->print(","); }
   }
