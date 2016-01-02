@@ -14,7 +14,7 @@
 #ifdef MBED_PLATFORM
 #include "mbed.h"
 
-#define USER_AGENT "User-Agent: M2X Mbed Client/2.1.1"
+#define USER_AGENT "User-Agent: M2X Mbed Client/2.2.0"
 #endif
 
 #include "Client.h"
@@ -101,6 +101,8 @@ public:
                   const char* path_prefix = NULL);
 
   // Push data stream value using PUT request, returns the HTTP status code
+  // NOTE: if you want to update by a serial, use "serial/<serial ID>" as
+  // the device ID here.
   template <class T>
   int updateStreamValue(const char* deviceId, const char* streamName, T value);
 
@@ -122,6 +124,8 @@ public:
   // stream, the succeeding +counts[1]+ number of items contain values
   // for the second stream, etc. The length of this array should be
   // the sum of all values in +counts+ array.
+  // NOTE: if you want to update by a serial, use "serial/<serial ID>" as
+  // the device ID here.
   template <class T>
   int postDeviceUpdates(const char* deviceId, int streamNum,
                         const char* names[], const int counts[],
@@ -136,6 +140,8 @@ public:
   // be exactly +streamNum+. Notice that the array of +values+ should
   // match the array of +names+, and that the ith value in +values+ is
   // exactly the value to post for the ith stream name in +names+
+  // NOTE: if you want to update by a serial, use "serial/<serial ID>" as
+  // the device ID here.
   template <class T>
   int postSingleDeviceUpdate(const char* deviceId, int streamNum,
                              const char* names[], T values[],
@@ -171,6 +177,8 @@ public:
   // precision, which means you are free to use the double-version only
   // without any precision problems.
   // Returned value is the http status code.
+  // NOTE: if you want to update by a serial, use "serial/<serial ID>" as
+  // the device ID here.
   template <class T>
   int updateLocation(const char* deviceId, const char* name,
                      T latitude, T longitude, T elevation);
@@ -195,7 +203,7 @@ public:
   // The status code is 204 on success and 400 on a bad request (e.g. the
   // timestamp is not in ISO8601 format or the from timestamp is not less than
   // or equal to the end timestamp.
-  int deleteValues(const char* deviceId, const char* streamName,
+ int deleteValues(const char* deviceId, const char* streamName,
                    const char* from, const char* end);
 
   // Fetches current timestamp in seconds from M2X server. Since we

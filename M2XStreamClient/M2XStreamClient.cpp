@@ -48,7 +48,7 @@ int M2XStreamClient::listStreamValues(const char* deviceId, const char* streamNa
     if (_path_prefix)
         _client->print(_path_prefix);
     _client->print("/v2/devices/");
-    print_encoded_string(_client, deviceId);
+    _client->print(deviceId);
     _client->print("/streams/");
     print_encoded_string(_client, streamName);
     _client->print("/values.json");
@@ -84,7 +84,7 @@ int M2XStreamClient::readLocation(const char* deviceId,
     if (_path_prefix)
         _client->print(_path_prefix);
     _client->print("/v2/devices/");
-    print_encoded_string(_client, deviceId);
+    _client->print(deviceId);
     _client->println("/location HTTP/1.0");
 
     writeHttpHeader(-1);
@@ -222,7 +222,7 @@ void M2XStreamClient::writePutHeader(const char* deviceId,
   if (_path_prefix)
     _client->print(_path_prefix);
   _client->print("/v2/devices/");
-  print_encoded_string(_client, deviceId);
+  _client->print(deviceId);
   _client->print("/streams/");
   print_encoded_string(_client, streamName);
   _client->println("/value HTTP/1.0");
@@ -237,7 +237,7 @@ void M2XStreamClient::writeDeleteHeader(const char* deviceId,
   if (_path_prefix)
     _client->print(_path_prefix);
   _client->print("/v2/devices/");
-  print_encoded_string(_client, deviceId);
+  _client->print(deviceId);
   _client->print("/streams/");
   print_encoded_string(_client, streamName);
   _client->print("/values");

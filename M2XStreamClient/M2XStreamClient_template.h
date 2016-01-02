@@ -61,7 +61,7 @@ int M2XStreamClient::postDeviceUpdates(const char* deviceId, int streamNum,
     if (_path_prefix)
       _client->print(_path_prefix);
     _client->print("/v2/devices/");
-    print_encoded_string(_client, deviceId);
+    _client->print(deviceId);
     _client->println("/updates HTTP/1.0");
     writeHttpHeader(length);
     write_multiple_values(_client, streamNum, names, counts, ats, values);
@@ -109,7 +109,7 @@ int M2XStreamClient::postSingleDeviceUpdate(const char* deviceId, int streamNum,
       _client->print(_path_prefix);
     }
     _client->print("/v2/devices/");
-    print_encoded_string(_client, deviceId);
+    _client->print(deviceId);
     _client->println("/update HTTP/1.0");
     writeHttpHeader(length);
     write_single_device_values(_client, streamNum, names, values, at);
@@ -168,7 +168,7 @@ int M2XStreamClient::updateLocation(const char* deviceId,
     if (_path_prefix)
       _client->print(_path_prefix);
     _client->print("/v2/devices/");
-    print_encoded_string(_client, deviceId);
+    _client->print(deviceId);
     _client->println("/location HTTP/1.0");
 
     writeHttpHeader(length);
