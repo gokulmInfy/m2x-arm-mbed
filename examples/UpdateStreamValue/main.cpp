@@ -1,3 +1,5 @@
+#define MBED_PLATFORM
+
 #include <jsonlite.h>
 #include "M2XStreamClient.h"
 

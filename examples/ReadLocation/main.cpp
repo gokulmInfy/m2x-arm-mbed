@@ -1,3 +1,6 @@
+#define MBED_PLATFORM
+#define M2X_ENABLE_READER
+
 #include <jsonlite.h>
 #include "M2XStreamClient.h"
 

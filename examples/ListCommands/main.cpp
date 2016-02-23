@@ -1,4 +1,5 @@
 #define MBED_PLATFORM
+#define M2X_ENABLE_READER
 
 #include <jsonlite.h>
 #include "M2XStreamClient.h"
@@ -6,18 +7,18 @@
 #include "mbed.h"
 #include "EthernetInterface.h"
 
-char deviceId[] = "<device id>"; // Device you want to update
+char deviceId[] = "<device id>"; // Device you want to receive commands
 char m2xKey[] = "<m2x api key>"; // Your M2X API Key or Master API Key
-
-char name[] = "<location name>"; // Name of current location of datasource
-double latitude = -37.97884;
-double longitude = -57.54787; // You can also read those values from a GPS
-double elevation = 15;
 
 Client client;
 M2XStreamClient m2xClient(&client, m2xKey);
 
 EthernetInterface eth;
+
+void on_command_found(const char* id, const char* name, int index, void *context) {
+  printf("Found a command, index: %d\n", index);
+  printf("ID: %s\n Name: %s\n", id, name);
+}
 
 int main() {
   eth.init();
@@ -25,9 +26,8 @@ int main() {
   printf("IP Address: %s\n", eth.getIPAddress());
 
   while (true) {
-    int response = m2xClient.updateLocation(deviceId, name, latitude, longitude, elevation);
-    printf("Update response code: %d\n", response);
-    elevation++;
+    int response = m2xClient.listCommands(deviceId, on_command_found, NULL);
+    printf("Response code: %d\n", response);
 
     if (response == -1) while (true) ;
 
