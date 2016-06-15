@@ -3,7 +3,7 @@ ARM mbed M2X API Client
 
 *NOTE*: We've [changed](https://github.com/attm2x/m2x-arm-mbed/commit/f604195ea13fa97c15faa5f1ae263658bec49686) one API function to avoid ambiguity. If you are using the older version of this library, there's a chance that you need to update your existing code to reflect the changed API.
 
-The ARM mbed client library is used to send/receive data to/from [AT&amp;T's M2X service](https://m2x.att.com/) from [mbed LPC1768](http://mbed.org/platforms/mbed-LPC1768/) microcontrollers.
+The ARM mbed client library is used to send/receive data to/from [AT&amp;T's M2X service](https://m2x.att.com/) from [mbed LPC1768](http://mbed.org/platforms/mbed-LPC1768/) or [FRDM-K64F](https://developer.mbed.org/platforms/FRDM-K64F/) microcontrollers.
 
 Getting Started
 ==========================
@@ -11,9 +11,9 @@ Getting Started
 2. Obtain your _Master Key_ from the Master Keys tab of your [Account Settings](https://m2x.att.com/account) screen.
 2. Create your first [Device](https://m2x.att.com/devices) and copy its _Device ID_.
 3. Review the [M2X API Documentation](https://m2x.att.com/developer/documentation/overview).
-4. Obtain an [mbed LPC1768](http://mbed.org/platforms/mbed-LPC1768/) and an [mbed application board](http://mbed.org/cookbook/mbed-application-board).
+4. You have 2 choices for hardware: you can obtain an [mbed LPC1768](http://mbed.org/platforms/mbed-LPC1768/) with an [mbed application board](http://mbed.org/cookbook/mbed-application-board), or you can obtain a [FRDM-K64F](http://www.nxp.com/products/software-and-tools/hardware-development-tools/freedom-development-boards/freedom-development-platform-for-kinetis-k64-k63-and-k24-mcus:FRDM-K64F) board.
 
-**NOTE**: Though [similiar boards](http://mbed.org/cookbook/Homepage) exist and may also do the job, this doc is specific to using a combination of mbed LPC1768 microcontroller and mbed application board
+**NOTE**: Though [similiar boards](http://mbed.org/cookbook/Homepage) exist and may also do the job, this doc is specific to using a combination of mbed LPC1768 microcontroller and mbed application board, or a single FRDM-K64F
 
 **ublox** Modem/GPS shield users can find a m2x working demo with freescale boards on the mbed website [here](http://developer.mbed.org/teams/ublox/code/Cellular_m2x-demo-all/).
 
@@ -45,8 +45,9 @@ To run the examples, please follow the steps below:
     ```
 
 8. Create a file named `main.cpp`, and paste in any of the examples. Modify the M2X API Key, device ID or stream name as needed by the examples.
-9. When you are done, click `Compile`. if no error is found, a bin file will be downloaded to your computer.
-10. Copy that bin file to your mbed microcontroller, press the `reset` button, then you should be able to run the program!
+9. At the top right corner, make sure you are selecting the same platform as your board.
+10. When you are done, click `Compile`. if no error is found, a bin file will be downloaded to your computer.
+11. Copy that bin file to your mbed microcontroller, press the `reset` button, then you should be able to run the program!
 
 Variables used in Examples
 ==========================
@@ -122,6 +123,8 @@ int updateStreamValue(const char* deviceId, const char* streamName, T value);
 ```
 
 Here we use C++ templates to generate functions for different types of values, feel free to use values of `float`, `int`, `long` or even `const char*` types here.
+
+NOTE: Our example here is configured to use a temperature sensor for generating values, this only applies to LPC1768 board with the application extention board. If you are using FRDM-K64F board, you might need to change this code or attach a separate temperature sensor.
 
 Post device updates
 -------------------
