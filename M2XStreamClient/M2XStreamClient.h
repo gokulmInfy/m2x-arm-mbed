@@ -1118,12 +1118,14 @@ static inline int fill_iso8601_timestamp(int32_t timestamp, int32_t milli,
 
 // Data structures and functions used to parse stream values
 
-#define STREAM_BUF_LEN 32
+#ifndef M2X_STREAM_BUF_LEN
+#define M2X_STREAM_BUF_LEN 32
+#endif  /* M2X_STREAM_BUF_LEN */
 
 typedef struct {
   uint8_t state;
-  char at_str[STREAM_BUF_LEN + 1];
-  char value_str[STREAM_BUF_LEN + 1];
+  char at_str[M2X_STREAM_BUF_LEN + 1];
+  char value_str[M2X_STREAM_BUF_LEN + 1];
   int index;
 
   stream_value_read_callback callback;
@@ -1164,13 +1166,13 @@ static void on_stream_value_found(jsonlite_callback_context* context,
 
   if (TEST_IS_AT(state->state)) {
     strncpy(state->at_str, (const char*) token->start,
-            MIN(token->end - token->start, STREAM_BUF_LEN));
-    state->at_str[MIN(token->end - token->start, STREAM_BUF_LEN)] = '\0';
+            MIN(token->end - token->start, M2X_STREAM_BUF_LEN));
+    state->at_str[MIN(token->end - token->start, M2X_STREAM_BUF_LEN)] = '\0';
     state->state |= GOT_AT;
   } else if (TEST_IS_VALUE(state->state)) {
     strncpy(state->value_str, (const char*) token->start,
-            MIN(token->end - token->start, STREAM_BUF_LEN));
-    state->value_str[MIN(token->end - token->start, STREAM_BUF_LEN)] = '\0';
+            MIN(token->end - token->start, M2X_STREAM_BUF_LEN));
+    state->value_str[MIN(token->end - token->start, M2X_STREAM_BUF_LEN)] = '\0';
     state->state |= GOT_VALUE;
   }
 

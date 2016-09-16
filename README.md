@@ -222,6 +222,15 @@ int deleteValues(const char* deviceId, const char* streamName,
 
 `from` and `end` fields here follow ISO 8601 time format.
 
+Adjust read buffer
+------------------
+
+In reader functions, by default we use a buffer of 32 bytes to store temporary response data from server. But if memory is not a concern for you, you might want to boost buffer size for better performance and avoiding potential problems with this:
+
+```
+#define M2X_STREAM_BUF_LEN 128
+```
+
 How to read Serial output
 =========================
 
