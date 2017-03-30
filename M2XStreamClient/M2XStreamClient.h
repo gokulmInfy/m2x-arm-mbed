@@ -61,8 +61,9 @@ static inline bool m2x_status_is_error(int status) {
   return m2x_status_is_client_error(status) ||
       m2x_status_is_server_error(status);
 }
-
-// Null Print class used to calculate length to print
+/*
+ * Null Print class used to calculate length to print
+ */
 class NullPrint : public Print {
 public:
   size_t counter;
@@ -100,7 +101,7 @@ static inline int print_encoded_string(Print* print, const char* str) {
 }
 
 #ifdef M2X_ENABLE_READER
-/*
+/**
  * +type+ indicates the value type: 1 for string, 2 for number
  * NOTE that the value type here only contains a hint on how
  * you can use the value. Even though 2 is returned, the value
@@ -138,49 +139,53 @@ public:
                   const char* host = DEFAULT_M2X_HOST,
                   int port = DEFAULT_M2X_PORT,
                   const char* path_prefix = NULL);
-
-  // Push data stream value using PUT request, returns the HTTP status code
-  // NOTE: if you want to update by a serial, use "serial/<serial ID>" as
-  // the device ID here.
+/**
+ * Method for <a href="https://m2x.att.com/developer/documentation/v2/device#Update-Data-Stream-Value">Update Data Stream Value</a> endpoint.
+ * Push data stream value using PUT request, returns the HTTP status code
+ * @param deviceId - id of the device to post values
+ * @param streamName - Name of the stream.
+ * @param value - the value.<p>
+ * NOTE: if you want to update by a serial, use "serial/<serial ID>" as the device ID here.
+ */
+ 
   template <class T>
   int updateStreamValue(const char* deviceId, const char* streamName, T value);
 
-  // Post multiple values to M2X all at once.
-  // +deviceId+ - id of the device to post values
-  // +streamNum+ - Number of streams to post
-  // +names+ - Array of stream names, the length of the array should
-  // be exactly +streamNum+
-  // +counts+ - Array of +streamNum+ length, each item in this array
-  // containing the number of values we want to post for each stream
-  // +ats+ - Timestamps for each value, the length of this array should
-  // be the some of all values in +counts+, for the first +counts[0]+
-  // items, the values belong to the first stream, for the following
-  // +counts[1]+ number of items, the values belong to the second stream,
-  // etc. Notice that timestamps are required here: you must provide
-  // a timestamp for each value posted.
-  // +values+ - Values to post. This works the same way as +ats+, the
-  // first +counts[0]+ number of items contain values to post to the first
-  // stream, the succeeding +counts[1]+ number of items contain values
-  // for the second stream, etc. The length of this array should be
-  // the sum of all values in +counts+ array.
-  // NOTE: if you want to update by a serial, use "serial/<serial ID>" as
-  // the device ID here.
+  /**
+   * Method for <a href="https://m2x.att.com/developer/documentation/v2/device#Post-Device-Updates--Multiple-Values-to-Multiple-Streams-">Post Device Updates (Multiple Values to Multiple Streams)</a> endpoint.
+   * Post multiple values to M2X all at once.
+   * @param deviceId - id of the device to post values
+   * @param streamNum - Number of streams to post
+   * @param names - Array of stream names, the length of the array should be exactly +streamNum+
+   * @param counts - Array of +streamNum+ length, each item in this array containing the number of values we want to post for each stream
+   * @param ats - Timestamps for each value, the length of this array should be the some of all values in +counts+, for the first +counts[0]+
+   * items, the values belong to the first stream, for the following
+   * +counts[1]+ number of items, the values belong to the second stream,
+   * etc. Notice that timestamps are required here: you must provide
+   * a timestamp for each value posted.
+   * @param values - Values to post. This works the same way as +ats+, the
+   * first +counts[0]+ number of items contain values to post to the first
+   * stream, the succeeding +counts[1]+ number of items contain values
+   * for the second stream, etc. The length of this array should be
+   * the sum of all values in +counts+ array.<p>
+   * NOTE: if you want to update by a serial, use "serial/<serial ID>" as
+   * the device ID here.
+   */
   template <class T>
   int postDeviceUpdates(const char* deviceId, int streamNum,
                         const char* names[], const int counts[],
                         const char* ats[], T values[]);
 
-  // Post multiple values of a single device at once.
-  // +deviceId+ - id of the device to post values
-  // +streamNum+ - Number of streams to post
-  // +names+ - Array of stream names, the length of the array should
-  // be exactly +streamNum+
-  // +values+ - Array of values to post, the length of the array should
-  // be exactly +streamNum+. Notice that the array of +values+ should
-  // match the array of +names+, and that the ith value in +values+ is
-  // exactly the value to post for the ith stream name in +names+
-  // NOTE: if you want to update by a serial, use "serial/<serial ID>" as
-  // the device ID here.
+ /**
+  * Method for <a href="https://m2x.att.com/developer/documentation/v2/device#Post-Device-Update--Single-Values-to-Multiple-Streams-">Post Device Update</a> endpoint.
+  * Post multiple values of a single device at once.
+  * @param deviceId - id of the device to post values
+  * @param streamNum - Number of streams to post
+  * @param names - Array of stream names, the length of the array should  be exactly +streamNum+
+  * @param values - Array of values to post, the length of the array should  be exactly +streamNum+. Notice that the array of +values+ should
+  * match the array of +names+, and that the ith value in +values+ is  exactly the value to post for the ith stream name in +names+<p>
+  * NOTE: if you want to update by a serial, use "serial/<serial ID>" as  the device ID here.
+  */
   template <class T>
   int postDeviceUpdate(const char* deviceId, int streamNum,
                        const char* names[], T values[],
@@ -204,22 +209,26 @@ public:
                        const char* query = NULL);
 #endif  /* M2X_ENABLE_READER */
 
-  // Update datasource location
-  // NOTE: On an Arduino Uno and other ATMEGA based boards, double has
-  // 4-byte (32 bits) precision, which is the same as float. So there's
-  // no natural double-precision floating number on these boards. With
-  // a float value, we have a precision of roughly 7 digits, that means
-  // either 5 or 6 digits after the floating point. According to wikipedia,
-  // a difference of 0.00001 will give us ~1.1132m distance. If this
-  // precision is good for you, you can use the double-version we provided
-  // here. Otherwise, you may need to use the string-version and do the
-  // actual conversion by yourselves.
-  // However, with an Arduino Due board, double has 8-bytes (64 bits)
-  // precision, which means you are free to use the double-version only
-  // without any precision problems.
-  // Returned value is the http status code.
-  // NOTE: if you want to update by a serial, use "serial/<serial ID>" as
-  // the device ID here.
+ /**
+  * Method for <a href="https://m2x.att.com/developer/documentation/v2/device#Update-Device-Location">Update Device Location</a> endpoint.
+  * Update datasource location
+  * @param deviceId - id of the device.
+  * @param name - a name identifying this location
+  * @param latitude - latitude
+  * @param longitude - longitude
+  * @param elevation - elevation
+  * NOTE: On an Arduino Uno and other ATMEGA based boards, double has  4-byte (32 bits) precision,
+  * which is the same as float. So there's  no natural double-precision floating number on these boards.
+  * With  a float value, we have a precision of roughly 7 digits, that means  either 5 or 6 digits after the floating point.
+  * According to wikipedia,  a difference of 0.00001 will give us ~1.1132m distance.
+  * If this  precision is good for you, you can use the double-version we provided  here.
+  * Otherwise, you may need to use the string-version and do the  actual conversion by yourselves.
+  * However, with an Arduino Due board, double has 8-bytes (64 bits)  precision,
+  * which means you are free to use the double-version only without any precision problems.
+  * Returned value is the http status code.<p>
+  * NOTE: if you want to update by a serial, use "serial/<serial ID>" as  the device ID here.
+  */
+  
   template <class T>
   int updateLocation(const char* deviceId, const char* name,
                      T latitude, T longitude, T elevation);
@@ -232,20 +241,22 @@ public:
                    void* context);
 #endif  /* M2X_ENABLE_READER */
 
-  // Delete values from a data stream
-  // You will need to provide from and end date/time strings in the ISO8601
-  // format "yyyy-mm-ddTHH:MM:SS.SSSZ" where
-  //   yyyy: the year
-  //   mm: the month
-  //   dd: the day
-  //   HH: the hour (24 hour format)
-  //   MM: the minute
-  //   SS.SSS: the seconds (to the millisecond)
-  // NOTE: the time is given in Zulu (GMT)
-  // M2X will delete all values within the from to end date/time range.
-  // The status code is 204 on success and 400 on a bad request (e.g. the
-  // timestamp is not in ISO8601 format or the from timestamp is not less than
-  // or equal to the end timestamp.
+/**
+ * Method for <a href="https://m2x.att.com/developer/documentation/v2/device#Delete-Data-Stream-Values">Delete Data Stream Values</a> endpoint.
+ * Delete values from a data stream
+ * @param deviceId - id of the device to post values<p>
+ * You will need to provide from and end date/time strings in the ISO8601
+ * format "yyyy-mm-ddTHH:MM:SS.SSSZ" where
+ *     yyyy: the year
+ *     mm: the month
+ *     dd: the day
+ *     HH: the hour (24 hour format)
+ *     MM: the minute
+ *     SS.SSS: the seconds (to the millisecond)<p>
+ * NOTE: the time is given in Zulu (GMT) M2X will delete all values within the from to end date/time range.
+ * The status code is 204 on success and 400 on a bad request (e.g. the timestamp is not in ISO8601 format or the from timestamp is not less than
+ * or equal to the end timestamp.
+ */
   int deleteValues(const char* deviceId, const char* streamName,
                    const char* from, const char* end);
 
@@ -258,91 +269,101 @@ public:
                    const char* query = NULL);
 #endif  /* M2X_ENABLE_READER */
 
-  // Mark a command as processed.
-  // Link: https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Processed
-  // To make sure the minimal amount of memory is needed, this API works with
-  // a callback function. The callback function is then used to fill the request
-  // data, note that in order to correctly set the content length in HTTP header,
-  // the callback function will be called twice, the caller must make sure both
-  // calls fill the Print object with exactly the same data.
-  // If you have a pre-allocated buffer filled with the data to post, you can
-  // use markCommandProcessedWithData API below.
+ /**
+  * Method for <a href="https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Processed">Device Marks a Command as Processed</a> endpoint.
+  * @param deviceId - id of the device
+  * @param commandId - id of the command
+  * @param callback - To make sure the minimal amount of memory is needed, this API works with
+  * a callback function. The callback function is then used to fill the request
+  * data, note that in order to correctly set the content length in HTTP header,
+  * the callback function will be called twice, the caller must make sure both
+  * calls fill the Print object with exactly the same data.
+  * If you have a pre-allocated buffer filled with the data to post, you can
+  * use markCommandProcessedWithData API below.
+  *
+  * @param context - the context
+  * */
   int markCommandProcessed(const char* deviceId, const char* commandId,
                            m2x_fill_data_callback callback, void *context);
-
-  // Mark a command as processed with a data buffer
-  // Link: https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Processed
-  // This is exactly like markCommandProcessed, except that a buffer is use to
-  // contain the data to post as the request body.
+/**
+ * Method for <a href="https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Processed">Device Marks a Command as Processed</a> endpoint.
+ * Mark a command as processed with a data buffer.
+ * This is exactly like markCommandProcessed, except that a buffer is use to
+ * contain the data to post as the request body.
+ * @param deviceId - id of the device
+ * @param commandId - id of the command
+ * @param data - the data buffer
+ */
   int markCommandProcessedWithData(const char* deviceId, const char* commandId,
                                    const char* data);
-
-  // Mark a command as rejected.
-  // Link: https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Rejected
-  // To make sure the minimal amount of memory is needed, this API works with
-  // a callback function. The callback function is then used to fill the request
-  // data, note that in order to correctly set the content length in HTTP header,
-  // the callback function will be called twice, the caller must make sure both
-  // calls fill the Print object with exactly the same data.
-  // If you have a pre-allocated buffer filled with the data to post, you can
-  // use markCommandRejectedWithData API below.
+/**
+ * Method for <a href="https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Rejected">Device Marks a Command as Rejected</a> endpoint.
+ * Mark a command as rejected.
+ * @param deviceId - id of the device
+ * @param commandId - id of the command
+ * @param callback - To make sure the minimal amount of memory is needed, this API works with
+ * a callback function. The callback function is then used to fill the request data, note that in order to correctly set the content length in HTTP header,
+ * the callback function will be called twice, the caller must make sure both calls fill the Print object with exactly the same data.
+ * If you have a pre-allocated buffer filled with the data to post, you can use markCommandRejectedWithData API below.
+ */
   int markCommandRejected(const char* deviceId, const char* commandId,
                           m2x_fill_data_callback callback, void *context);
-
-  // Mark a command as rejected with a data buffer
-  // Link: https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Rejected
-  // This is exactly like markCommandRejected, except that a buffer is use to
-  // contain the data to post as the request body.
+/**
+ * Method for <a href="https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Rejected">Device Marks a Command as Rejected</a> endpoint.
+ * Mark a command as rejected with a data buffer
+ * This is exactly like markCommandRejected, except that a buffer is use to contain the data to post as the request body.
+ * @param deviceId - id of the device
+ * @param commandId - id of the command
+ * @param data - the data buffer
+ */
   int markCommandRejectedWithData(const char* deviceId, const char* commandId,
                                   const char* data);
 
-  // Fetches current timestamp in seconds from M2X server. Since we
-  // are using signed 32-bit integer as return value, this will only
-  // return valid results before 03:14:07 UTC on 19 January 2038. If
-  // the device is supposed to work after that, this function should
-  // not be used.
-  //
-  // The returned value will contain the status code(positive values)
-  // or the error code(negative values).
-  // In case of success, the current timestamp will be filled in the
-  // +ts+ pointer passed in as argument.
-  //
-  // NOTE: although returning uint32_t can give us a larger space,
-  // we prefer to cope with the unix convention here.
+  /**
+   * Fetches current timestamp in seconds from M2X server. Since we
+   * are using signed 32-bit integer as return value, this will only
+   * return valid results before 03:14:07 UTC on 19 January 2038. If
+   * the device is supposed to work after that, this function should
+   * not be used.<p>
+   * The returned value will contain the status code(positive values)
+   * or the error code(negative values).In case of success, the current timestamp will be filled in the
+   *  +ts+ pointer passed in as argument.<p>
+   *  NOTE: although returning uint32_t can give us a larger space,
+   *   we prefer to cope with the unix convention here.
+   */
   int getTimestamp32(int32_t* ts);
 
-  // Fetches current timestamp in seconds from M2X server.
-  // This function will return the timestamp as an integer literal
-  // in the provided buffer. Hence there's no problem working after
-  // 03:14:07 UTC on 19 January 2038. The drawback part here, is that
-  // you will have to work with 64-bit integer, which is not available
-  // on certain platform(such as Arduino), a bignum library or alike
-  // is needed in this case.
-  //
-  // Notice +bufferLength+ is supposed to contain the length of the
-  // buffer when calling this function. It is also the caller's
-  // responsibility to ensure the buffer is big enough, otherwise
-  // the library will return an error indicating the buffer is too
-  // small.
-  // While this is not accurate all the time, one trick here is to
-  // pass in 0 as the bufferLength, in which case we will always return
-  // the buffer-too-small error. However, the correct buffer length
-  // can be found this way so a secound execution is most likely to work
-  // (unless we are at the edge of the buffer length increasing, for
-  // example, when the timestamp jumps from 9999999999 to 10000000000,
-  // which is highly unlikely to happend). However, given that the
-  // maximum 64-bit integer can be stored in 19 bytes, there's not
-  // much need to use this trick.)
-  //
-  // The returned value will contain the status code(positive values)
-  // or the error code(negative values).
-  // In case of success, the current timestamp will be filled in the
-  // passed +buffer+ pointer, and the actual used buffer length will
-  // be returned in +bufferLength+ pointer.
-  // NOTE: as long as we can read the returned buffer length, it will
-  // be used to fill in the +bufferLength+ variable even though other
-  // errors occur(buffer is not enough, network is shutdown before
-  // reading the whole buffer, etc.)
+  /**
+   * Fetches current timestamp in seconds from M2X server.
+   * This function will return the timestamp as an integer literal
+   * in the provided buffer. Hence there's no problem working after
+   * 03:14:07 UTC on 19 January 2038. The drawback part here, is that
+   * you will have to work with 64-bit integer, which is not available
+   * on certain platform(such as Arduino), a bignum library or alike
+   * is needed in this case.<p>
+   * Notice +bufferLength+ is supposed to contain the length of the
+   * buffer when calling this function. It is also the caller's
+   * responsibility to ensure the buffer is big enough, otherwise
+   * the library will return an error indicating the buffer is too small.
+   * While this is not accurate all the time, one trick here is to
+   * pass in 0 as the bufferLength, in which case we will always return
+   * the buffer-too-small error. However, the correct buffer length
+   * can be found this way so a secound execution is most likely to work
+   * (unless we are at the edge of the buffer length increasing, for
+   * example, when the timestamp jumps from 9999999999 to 10000000000,
+   * which is highly unlikely to happend). However, given that the
+   * maximum 64-bit integer can be stored in 19 bytes, there's not
+   * much need to use this trick.)<p>
+   * The returned value will contain the status code(positive values)
+   * or the error code(negative values).<p>
+   * In case of success, the current timestamp will be filled in the
+   * passed +buffer+ pointer, and the actual used buffer length will
+   * be returned in +bufferLength+ pointer.<p>
+   * NOTE: as long as we can read the returned buffer length, it will
+   * be used to fill in the +bufferLength+ variable even though other
+   * errors occur(buffer is not enough, network is shutdown before
+   * reading the whole buffer, etc.)
+   */
   int getTimestamp(char* buffer, int* bufferLength);
 private:
   Client* _client;
@@ -354,32 +375,52 @@ private:
   const char* _path_prefix;
   NullPrint _null_print;
 
-  // Writes the HTTP header part for updating a stream value
+   /**
+    * Writes the HTTP header part for updating a stream value
+    */
   void writePutHeader(const char* deviceId,
                       const char* streamName,
                       int contentLength);
-  // Writes the HTTP header part for deleting stream values
+  /**
+   *  Writes the HTTP header part for deleting stream values
+   */
   void writeDeleteHeader(const char* deviceId,
                          const char* streamName,
                          int contentLength);
-  // Writes HTTP header lines including M2X API Key, host, content
-  // type and content length(if the body exists)
+  /**
+   * Writes HTTP header lines including M2X API Key, host, content
+   * type and content length(if the body exists)
+   */
   void writeHttpHeader(int contentLength);
-  // Parses HTTP response header and return the content length.
-  // Note that this function does not parse all http headers, as long
-  // as the content length is found, this function will return
+
+  /**
+   * Parses HTTP response header and return the content length.
+   * Note that this function does not parse all http headers, as long
+   * as the content length is found, this function will return
+   */
   int readContentLength();
-  // Skips all HTTP response header part. Return minus value in case
-  // the connection is closed before we got all headers
+
+   /**
+    * Skips all HTTP response header part. Return minus value in case
+    * the connection is closed before we got all headers
+    */
   int skipHttpHeader();
-  // Parses and returns the HTTP status code, note this function will
-  // return immediately once it gets the status code
+
+  /**
+   * Parses and returns the HTTP status code, note this function will
+   * return immediately once it gets the status code
+   */
   int readStatusCode(bool closeClient);
-  // Waits for a certain string pattern in the HTTP header, and returns
-  // once the pattern is found. In the pattern, you can use '*' to denote
-  // any character
+
+  /**
+   * Waits for a certain string pattern in the HTTP header, and returns
+   * once the pattern is found. In the pattern, you can use '*' to denote
+   * any character
+   */
   int waitForString(const char* str);
-  // Closes the connection
+
+  /** Closes the connection
+   */
   void close();
 
 #ifdef M2X_ENABLE_READER
